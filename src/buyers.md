@@ -6,7 +6,7 @@ title: 매수자 분석
 import {chart} from "./components/charts.js";
 import {dataTable} from "./components/table.js";
 import {enhanceUI} from "./components/appearance.js";
-import {heading, num, PALETTE} from "./components/ui.js";
+import {heading, num, pct, signed, PALETTE} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const rone = Array.from(await FileAttachment("data/rone.parquet").parquet(), (d) => ({...d, date: new Date(d.date)}))
   .filter((d) => d.metric === "mm_buyer_residence" || d.metric === "mm_buyer_age");
@@ -60,12 +60,12 @@ const line = (key) => picked.map((region, i) => {
   const rows = wide.filter((d) => d.region === region && d.date >= since);
   const data = rows.map((d, j) => {
     const w = rows.slice(Math.max(0, j - 2), j + 1).map((x) => x[key]).filter((x) => x != null);
-    return [+d.date, j >= 2 && w.length === 3 ? +(w.reduce((a, b) => a + b, 0) / 3 * 100).toFixed(2) : null];
+    return [+d.date, j >= 2 && w.length === 3 ? w.reduce((a, b) => a + b, 0) / 3 * 100 : null];
   });
   return {name: label(region), type: "line", itemStyle: {color: PALETTE[i]}, data};
 });
 const pctChart = (key) => chart({xAxis: {type: "time"}, yAxis: {name: "%", axisLabel: {formatter: "{value}%", fontSize: 10}},
-  tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => v == null ? "–" : `${Number(v).toFixed(1)}%`},
+  tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => v == null ? "–" : `${num(v)}%`},
   series: line(key)}, invalidation);
 const first = picked[0];
 const ageKeys = ["20대이하", "30대", "40대", "50대", "60대", "70대이상"].filter((k) => wide.some((d) => d.ages[k] != null));
@@ -77,9 +77,9 @@ const ageKeys = ["20대이하", "30대", "40대", "50대", "60대", "70대이상
   <div class="card">${heading("서울 거주자의 매수 비중 (3개월 평균)", "서울이 아닌 지역에서, 서울에 사는 사람이 산 비율입니다. 서울 수요가 경기로 넘어가는 흐름을 볼 때 씁니다. 서울 지역은 표시하지 않습니다.")}<div class="chart-slot">${pctChart("fromSeoul")}</div></div>
   <div class="card">${heading(`연령대 구성 — ${first ? label(first) : ""}`, "고른 첫 번째 지역의 월별 매수자 연령대 구성입니다. 합이 100%가 되도록 쌓았습니다.")}<div class="chart-slot">${chart({
     xAxis: {type: "time"}, yAxis: {name: "%", max: 100, axisLabel: {formatter: "{value}%", fontSize: 10}},
-    tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => v == null ? "–" : `${Number(v).toFixed(1)}%`},
+    tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => v == null ? "–" : `${num(v)}%`},
     series: ageKeys.map((k, i) => ({name: k, type: "line", stack: "age", areaStyle: {opacity: .5}, itemStyle: {color: PALETTE[i % PALETTE.length]},
-      data: wide.filter((d) => d.region === first && d.date >= since).map((d) => [+d.date, d.ages[k] == null ? null : +(d.ages[k] * 100).toFixed(2)])}))
+      data: wide.filter((d) => d.region === first && d.date >= since).map((d) => [+d.date, d.ages[k] == null ? null : d.ages[k] * 100])}))
   }, invalidation)}</div></div>
 </div>
 
@@ -95,8 +95,8 @@ const latest = regionNames.map((region) => {
   return {region: label(region), total: cur.total, outsider: cur.outsider, outsiderChg: cur.outsider != null && old?.outsider != null ? cur.outsider - old.outsider : null,
     young: cur.young, fromSeoul: cur.fromSeoul};
 }).filter(Boolean);
-const pp = (v) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(1)}%p`;
-const p1 = (v) => v == null ? "–" : `${(v * 100).toFixed(1)}%`;
+const pp = (v) => v == null ? "–" : `${signed(v)}p`;
+const p1 = pct;
 ```
 
 <div class="card grid-1">

@@ -1,5 +1,6 @@
 import {TabulatorFull as Tabulator} from "npm:tabulator-tables@6.7.1";
 import {html} from "npm:htl";
+import {num} from "./format.js";
 
 export function dataTable(rows, columns, invalidation) {
   const search = html`<input type="search" placeholder="표에서 검색…" aria-label="표 전체 검색">`;
@@ -9,7 +10,7 @@ export function dataTable(rows, columns, invalidation) {
   const node = html`<section class="data-table"><div class="table-toolbar">${search}${count}${clear}</div>${grid}<p class="table-help">열 제목으로 정렬 · + 버튼으로 숨겨진 항목 보기</p></section>`;
   let table;
   let ready = false;
-  const text = (value, column) => column.format ? column.format(value) : value ?? "–";
+  const text = (value, column) => column.format ? column.format(value) : typeof value === "number" || typeof value === "bigint" ? num(value) : value ?? "–";
   const observer = new ResizeObserver(([entry]) => {
     if (!entry.contentRect.width || table) return;
     table = new Tabulator(grid, {

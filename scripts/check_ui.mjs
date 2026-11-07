@@ -8,8 +8,7 @@ for (const width of [320,390,1440]) {
  for(const page of ['', 'regions','complexes','market','budget','about']) {
   run('open',`${base}/${page}`);
   run("tab", "t1");
-  run('wait',page==='about'?'#observablehq-main h2':'.filters form');
-  if(page!=='about') run('wait','.interactive-chart svg');
+  run('wait',page==='about'?'#observablehq-main h2':'.interactive-chart svg');
   const raw=run('eval',`JSON.stringify({width:innerWidth,scroll:document.documentElement.scrollWidth,errors:[...document.querySelectorAll('.observablehq--error')].map(e=>e.textContent),controls:[...document.querySelectorAll('.filters input[type=number],.filters .ts-control')].every(e=>e.getBoundingClientRect().height>=34)})`);
   const data=JSON.parse(JSON.parse(raw));
   assert.equal(data.scroll,data.width,`${page} overflow at ${width}`);

@@ -125,7 +125,7 @@ const bandRows = Array.from(byBand, (d) => ({...d, period: d.recent ? "최근 6�
     <div class="chart-heading"><h3>신고가 · 직거래 · 해제 비율</h3><details class="chart-info"><summary aria-label="신고가 · 직거래 · 해제 비율 설명"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6m0-10h.01"></path></svg></summary><div class="chart-info-panel">월별 신고가·직거래·해제 거래의 비율을 함께 보여줍니다. 범례를 눌러 관심 지표만 남길 수 있습니다. 최근 달은 신고가 덜 접수되어 수치가 바뀔 수 있습니다.</div></details></div>
     <div class="chart-slot">${chart({
       xAxis: {data: rows.map((d) => d.ym)}, yAxis: {name: "%", axisLabel: {formatter: "{value}%", fontSize: 10}},
-      tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => `${Number(v).toFixed(1)}%`},
+      tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => `${num(v)}%`},
       series: [["신고가", "new_high_rate"], ["직거래", "direct_rate"], ["해제", "cancel_rate"]].map(([name, key]) => ({name, type: "line", data: rows.map((d) => d[key] == null ? null : d[key] * 100)}))
     }, invalidation)}</div>
     <p class="note">신고가 비율이 오르면 매도자 우위입니다. 해제·직거래 비율이 튀면 이상 거래를 의심해 볼 신호입니다.</p>
@@ -141,4 +141,4 @@ const bandRows = Array.from(byBand, (d) => ({...d, period: d.recent ? "최근 6�
   </div>
 </div>
 
-<p class="note">마지막 거래일: ${meta.last?.toLocaleDateString?.("ko-KR") ?? meta.last}. 해제 거래는 가격 통계에서 빼고, 거래량에는 회색으로만 표시합니다.</p>
+<p class="note">마지막 거래일: ${meta.last == null ? "–" : new Date(meta.last).toLocaleDateString("ko-KR")}. 해제 거래는 가격 통계에서 빼고, 거래량에는 회색으로만 표시합니다.</p>

@@ -1,15 +1,7 @@
 // 공용 UI·쿼리 도우미. 페이지에서 import 해서 쓴다.
 import {html} from "npm:htl";
 
-// ---------- 포맷 ----------
-export const won = (manwon) => {
-  if (manwon == null || isNaN(manwon)) return "–";
-  const eok = manwon / 10000;
-  return eok >= 1 ? `${eok.toFixed(eok >= 10 ? 1 : 2).replace(/\.?0+$/, "")}억` : `${Math.round(manwon).toLocaleString("ko-KR")}만`;
-};
-export const pct = (x, digits = 1) => (x == null || isNaN(x) ? "–" : `${(x * 100).toFixed(digits)}%`);
-export const signed = (x, digits = 1) => (x == null || isNaN(x) ? "–" : `${x > 0 ? "+" : ""}${(x * 100).toFixed(digits)}%`);
-export const num = (x) => (x == null || isNaN(x) ? "–" : Math.round(x).toLocaleString("ko-KR"));
+export {num, won, pct, signed} from "./format.js";
 
 // ---------- 색 (라이트/다크 모두 대비 확인한 값; style.css 토큰과 맞춤) ----------
 export const COLOR = {

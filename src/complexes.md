@@ -171,10 +171,10 @@ const monthlyMed = d3.rollups(valid, (v) => d3.median(v, (d) => d.price), (d) =>
   <div class="chart-heading"><h2>실거래 흐름</h2><details class="chart-info"><summary aria-label="실거래 흐름 설명"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6m0-10h.01"></path></svg></summary><div class="chart-info-panel">점은 선택한 평형의 개별 매매 거래이며 정상·신고가·해제를 구분합니다. 선은 월별 매매 중위가이며, 전월세 데이터가 있으면 전세 중위가도 표시합니다. 점선은 예산 기준선, 기록된 호가가 있으면 해당 가격선도 표시합니다. 범례로 거래 종류를 선택할 수 있습니다.</div></details></div>
   <div class="chart-slot">${chart({
     xAxis: {type: "time"}, yAxis: {name: "만 원", axisLabel: {formatter: (v) => won(v), fontSize: 10}},
-    tooltip: {trigger: "item", confine: true, renderMode: "richText", valueFormatter: (v) => typeof v === "number" ? won(v) : v},
+    tooltip: {trigger: "item", confine: true, renderMode: "richText", valueFormatter: (v) => Array.isArray(v) ? `${new Date(v[0]).toLocaleDateString("ko-KR")} · ${won(v[1])}` : won(v)},
     series: [
       ...["정상", "신고가", "해제"].map((name) => ({name, type: "scatter", symbolSize: 7,
-        data: deals.filter((d) => d.band === band && (d.canceled ? "해제" : d.new_high ? "신고가" : "정상") === name).map((d) => ({value: [+d.deal_date, d.price], name: `${d.deal_date.toLocaleDateString("ko-KR")} · ${d.area}㎡ · ${d.floor}층`}))})),
+        data: deals.filter((d) => d.band === band && (d.canceled ? "해제" : d.new_high ? "신고가" : "정상") === name).map((d) => ({value: [+d.deal_date, d.price], name: `${d.deal_date.toLocaleDateString("ko-KR")} · ${num(d.area)}㎡ · ${d.floor}층`}))})),
       {name: "월별 중위가", type: "line", data: monthlyMed.map((d) => [+d.date, d.p]),
         markLine: {symbol: "none", label: {position: "insideEndTop", fontSize: 10}, data: [
           {yAxis: 60000, name: "6억 · 디딤돌", label: {formatter: "6억 · 디딤돌"}},

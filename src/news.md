@@ -5,7 +5,7 @@ title: 뉴스·리포트
 ```js
 import {chart} from "./components/charts.js";
 import {enhanceUI} from "./components/appearance.js";
-import {heading, articleList, PALETTE} from "./components/ui.js";
+import {heading, num, articleList, PALETTE} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const articles = (await FileAttachment("data/articles.json").json()).map((a) => ({...a, day: a.published?.slice(0, 10)}));
 ```
@@ -84,6 +84,6 @@ const dayList = d3.timeDays(cutoff, new Date()).map((d) => d3.timeFormat("%Y-%m-
 </div>
 
 <div class="card grid-1">
-  ${heading(`기사 목록 — ${filtered.length.toLocaleString("ko-KR")}건`, "최신순입니다. 제목을 누르면 원문이 새 창으로 열립니다. 한 번에 150건까지 보여 줍니다.")}
+  ${heading(`기사 목록 — ${num(filtered.length)}건`, "최신순입니다. 제목을 누르면 원문이 새 창으로 열립니다. 한 번에 150건까지 보여 줍니다.")}
   ${articleList(filtered.slice(0, 150), {empty: "조건에 맞는 기사가 없습니다"})}
 </div>

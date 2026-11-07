@@ -40,7 +40,7 @@ const dates = [...new Set(weekly.filter((d) => new Date(d.date) >= since).map((d
 const rebased = regionsWk.map((r) => {
   const s = new Map(weekly.filter((d) => d.region_full === r).map((d) => [+new Date(d.date), d.value]));
   const base = s.get(dates[0]);
-  return {name: r, data: dates.map((t) => (s.has(t) && base ? +(s.get(t) / base * 100).toFixed(2) : null))};
+  return {name: r, data: dates.map((t) => (s.has(t) && base ? s.get(t) / base * 100 : null))};
 });
 ```
 

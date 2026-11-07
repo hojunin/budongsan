@@ -48,7 +48,7 @@ const since = new Date(); since.setFullYear(since.getFullYear() - years);
 const series = (metric, {item = null, transform = null} = {}) => picked.map((region, i) => {
   let rows = rone.filter((d) => d.metric === metric && d.region_full === region && (!item || d.item === item) && d.date >= since).sort((a, b) => a.date - b.date);
   let data = rows.map((d) => [+d.date, d.value]);
-  if (transform === "change") data = data.map(([t, v], j) => [t, j ? +((v / data[j - 1][1] - 1) * 100).toFixed(3) : null]).slice(1);
+  if (transform === "change") data = data.map(([t, v], j) => [t, j ? (v / data[j - 1][1] - 1) * 100 : null]).slice(1);
   return {name: label(region), type: "line", itemStyle: {color: PALETTE[i]}, data};
 });
 const roneChart = (metric, {name = "지수", ref = null, refLabel = "", ...opts} = {}) => chart({

@@ -26,6 +26,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: node --test scripts/test_format.mjs
       - run: npm run build
       - name: Check file sizes (Cloudflare Pages 25 MiB/파일)
         run: find dist -type f -size +24M -print -exec false {} +
