@@ -73,6 +73,6 @@ const rebased = regionsWk.map((r) => {
   <div class="card">
     ${heading("리포트 · 시장 동향", "한국부동산원·KB·연구기관의 동향 발표와 전망 보고서를 다룬 기사입니다.")}
     ${articleList(articles.filter((a) => a.category === "report").slice(0, 10))}
-    <p class="note"><a href="./reports">내 리포트 쓰기 →</a></p>
+    <p class="note"><a href="./reports/">내 리포트 쓰기 →</a></p>
   </div>
 </div>
