@@ -20,6 +20,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -116,7 +117,9 @@ def collect(api, con: duckdb.DuckDBPyConnection, jobs: dict[str, list[str]], mon
                     df = call(api, kind, code, ym, backoff=backoff)
                 except Exception as e:  # 기록하지 않으므로 다음 실행에서 다시 받는다
                     failed += 1
-                    print(f"[molit] {kind} {code} {ym} 실패: {e}", file=sys.stderr)
+                    # requests 오류 메시지에 요청 URL(serviceKey 포함)이 그대로 들어 있어 로그에 키가 남는다
+                    msg = re.sub(r"serviceKey=[^&\s'\"]+", "serviceKey=***", str(e))
+                    print(f"[molit] {kind} {code} {ym} 실패: {msg}", file=sys.stderr)
                     continue
                 save(con, kind, code, ym, df)
                 time.sleep(pause)

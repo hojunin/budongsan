@@ -63,4 +63,17 @@ s = collect(EmptyFirstAPI(), con3, {"trade": ["11140"]}, months, refresh=0, paus
 assert s["trade"] == {"calls": 3, "failed": 0}, s
 assert {t for _, t in con3.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'molit_trade'").fetchall()} == {"VARCHAR"}
 assert con3.execute("SELECT count(*) FROM molit_trade").fetchall()[0][0] == 2
+
+
+class LeakyAPI(FakeAPI):
+    """requests 처럼 오류 메시지에 serviceKey 가 든 URL 을 싣는다."""
+    def get_data(self, *a, **k):
+        raise ConnectionError("Max retries exceeded with url: /getRTMS?serviceKey=SECRET%2Fkey%3D%3D&LAWD_CD=11110")
+
+
+import contextlib, io  # noqa: E401,E402
+err = io.StringIO()
+with contextlib.redirect_stderr(err):
+    collect(LeakyAPI(), duckdb.connect(), {"trade": ["11110"]}, months[:1], pause=0, backoff=0)
+assert "SECRET" not in err.getvalue() and "serviceKey=***" in err.getvalue(), err.getvalue()
 print("ok")
