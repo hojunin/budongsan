@@ -2,6 +2,12 @@
 title: 데이터 사전
 ---
 
+```js
+import {enhanceUI} from "./components/appearance.js";
+const disposeUI = enhanceUI(invalidation);
+```
+
+
 # 데이터 사전
 
 <p class="lead">이 사이트의 숫자가 어디서 왔고, 무엇을 조심해야 하는지 정리합니다.</p>

@@ -1,0 +1,40 @@
+{
+  "conditions": {
+    "viewport": "390x844",
+    "dpr": 3,
+    "cpuSlowdown": 4,
+    "network": "9 Mbps / 50ms latency",
+    "baseURL": "http://localhost:3005",
+    "browserCache": "disabled",
+    "interactions": "programmatic, no recent-input exclusion benefit"
+  },
+  "results": [
+    {
+      "run": 1,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    }
+  ]
+}

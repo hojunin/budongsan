@@ -1,0 +1,406 @@
+{
+  "conditions": {
+    "viewport": "390x844",
+    "dpr": 3,
+    "cpuSlowdown": 4,
+    "network": "9 Mbps / 50ms latency",
+    "baseURL": "http://localhost:3004",
+    "browserCache": "disabled",
+    "interactions": "programmatic, no recent-input exclusion benefit"
+  },
+  "results": [
+    {
+      "run": 1,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/market",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/market",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/market",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    }
+  ]
+}

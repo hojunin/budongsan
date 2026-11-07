@@ -58,19 +58,8 @@ export function card(title, value, sub = "", tone = "") {
   </div>`;
 }
 
-export function sampleBanner(isSample) {
+export function sampleTag(isSample) {
   return isSample
-    ? html`<div class="banner warn" role="status"><strong>샘플 데이터</strong> — 인증키 없이 빌드되어 가짜 숫자가 표시되고 있습니다. 실제 판단에 쓰지 마세요.</div>`
+    ? html`<span class="mock-data-tag" role="status" aria-label="목데이터: 실제 판단에 사용하지 마세요" title="실제 판단에 사용하지 마세요">목데이터</span>`
     : "";
 }
-
-// 차트 공통 옵션: 모바일에서 글자 크기 유지, 여백 최소화
-export const plotBase = (width) => ({
-  width,
-  height: Math.max(220, Math.min(360, width * 0.55)),
-  marginLeft: 48,
-  marginRight: 12,
-  style: {fontSize: width < 520 ? "12px" : "13px", fontFamily: "var(--sans-serif)", overflow: "visible"},
-  x: {label: null},
-  y: {grid: true, label: null}
-});
