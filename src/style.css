@@ -10,14 +10,16 @@ html { font-size: 16px; }
 /* ---------- 토큰 ---------- */
 :root {
   --sans-serif: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  --theme-background: #f7f6f3;
+  --theme-background: #f4f7f8;
   --theme-background-alt: #ffffff;
-  --theme-foreground: #1d1f23;
+  --theme-foreground: #1e293b;
   --theme-foreground-muted: #4b4f57;
   --theme-foreground-faint: #8a8f98;
-  --theme-foreground-focus: #087f80;
+  --theme-foreground-focus: var(--accent);
   --accent: #087f80;
-  --accent-2: #2a6f97;
+  --accent-2: #626b86;
+  --rise: #c23531;
+  --fall: #2459aa;
   --good: #2f7d4f;
   --warn: #b25e09;
   --radius: 18px;
@@ -34,13 +36,15 @@ html { font-size: 16px; }
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --theme-background: #14161a;
-    --theme-background-alt: #1c1f24;
+    --theme-background: #101c25;
+    --theme-background-alt: #1c2b36;
     --theme-foreground: #eceef1;
     --theme-foreground-muted: #b9bec7;
     --theme-foreground-faint: #7d838d;
     --accent: #64d4c9;
-    --accent-2: #6fb3d9;
+    --accent-2: #b1b9db;
+    --rise: #ff8b83;
+    --fall: #8db5ff;
     --good: #6cc38f;
     --warn: #f0a24d;
     --shadow: none;
@@ -72,8 +76,8 @@ p, li { max-width: 68ch; line-height: 1.65; color: var(--theme-foreground-muted)
 .kpi-title { font-size: .8rem; color: var(--theme-foreground-faint); font-weight: 600; }
 .kpi-value { font-size: clamp(1.35rem, 3.6vw, 1.85rem); font-weight: 750; letter-spacing: -0.02em; margin-top: 4px; }
 .kpi-sub { font-size: .8rem; color: var(--theme-foreground-muted); margin-top: 2px; }
-.kpi.up .kpi-sub { color: #c23531; }
-.kpi.down .kpi-sub { color: var(--accent-2); }
+.kpi.up .kpi-sub { color: var(--rise); }
+.kpi.down .kpi-sub { color: var(--fall); }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); margin: var(--gap) 0; }
 .grid-1 { margin: var(--gap) 0; }
 
@@ -258,8 +262,8 @@ p.note::before { content: none; }
 .tabulator-responsive-collapse dt { font-weight: 500; color: var(--theme-foreground-muted); }
 .tabulator-responsive-collapse dd { margin: 0; text-align: right; }
 #observablehq-main .tabulator-responsive-collapse-toggle { background: var(--theme-background); color: var(--accent); border: 1px solid var(--color-lightGrey); width: 24px; height: 24px; line-height: 22px; border-radius: 6px; }
-.value-up { color: var(--accent); }
-.value-down { color: var(--accent-2); }
+.value-up { color: var(--rise); }
+.value-down { color: var(--fall); }
 @media (max-width: 640px) {
   #observablehq-main .filters { padding: 12px; gap: 12px; }
   #observablehq-main .filters form { flex-basis: calc(50% - 12px); width: auto; }
@@ -358,8 +362,8 @@ observablehq-loading { display: none !important; }
 /* ---------- 브리핑: 인사이트 문장 · 기사 목록 ---------- */
 .insight-list, .article-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .insight { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--color-lightGrey); border-radius: 12px; background: var(--theme-background-alt); }
-.insight.up { border-left: 3px solid var(--accent); }
-.insight.down { border-left: 3px solid var(--accent-2); }
+.insight.up { border-left: 3px solid var(--rise); }
+.insight.down { border-left: 3px solid var(--fall); }
 .insight-body { flex: 1; min-width: 0; }
 .insight-title { margin: 6px 0 4px; font-weight: 650; line-height: 1.5; max-width: none; }
 .insight-meta, .insight-detail { margin: 0; font-size: .78rem; color: var(--theme-foreground-faint); line-height: 1.6; max-width: none; }
@@ -380,3 +384,39 @@ observablehq-loading { display: none !important; }
 .personal-form input { font-size: 16px; min-height: 44px; }
 .personal-form button { min-height: 44px; }
 @media (max-width: 600px) { .question-grid, .personal-form { grid-template-columns: 1fr; } }
+
+#personal-result { min-height: 16rem; }
+
+.compare-filters { min-height: 240px; }
+
+.compare-table { display: block; width: 100%; overflow-x: auto; }
+
+@media (max-width:600px) {
+  .compare-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .compare-table tbody, .compare-table tr, .compare-table th, .compare-table td { display:block; }
+  .compare-table tr { border-bottom: 1px solid var(--color-lightGrey); padding: .5rem 0; }
+  .compare-table td::before { content: attr(data-label) ": "; font-weight: 600; }
+}
+
+.compare-filter-slot { min-height: 66px; }
+.compare-filter-multi { min-height: 66px; }
+.compare-filters > .observablehq--block { display: none; }
+
+#observablehq-main .compare-filters, #observablehq-main .compare-rent-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+.compare-filter-multi { grid-column: 1 / -1; }
+.compare-rent-controls > .observablehq--block:empty { display:none; }
+@media (max-width:600px) { #observablehq-main .compare-filters, #observablehq-main .compare-rent-controls { gap:8px; } }
+
+.compare-period { min-height: 100px; }
+
+.personal-form input[type=checkbox] { width: 20px; min-height: 20px; }
+
+.compare-filters .compare-filter-slot > .observablehq--block { margin: 0; }
+
+.personal-primary { font-size: 1.1rem; font-weight: 700; color: var(--theme-foreground); }
+
+.scenario-export { margin: 1rem 0; }
+.scenario-export label { display: block; min-height: 36px; }
+.scenario-export button { min-height: 44px; }
+
+.report-list-slot { box-sizing: border-box; height: 220px; overflow-y: auto; }

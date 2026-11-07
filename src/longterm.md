@@ -6,7 +6,7 @@ title: 10년 추이
 import {chart} from "./components/charts.js";
 import {dataTable} from "./components/table.js";
 import {enhanceUI} from "./components/appearance.js";
-import {heading, num, signed, PALETTE} from "./components/ui.js";
+import {heading, num, signed, regionColor} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const trend = Array.from(await FileAttachment("data/trend.parquet").parquet(), (d) => ({...d, n: Number(d.n), n84: Number(d.n84)}));
 ```
@@ -70,7 +70,7 @@ const nameOf = (code) => regions.find((r) => r.code === code)?.name ?? code;
   ${heading(`${METRICS[metric].label} — ${smooth ? "12개월 이동평균" : "월별"}`, "시군구는 거래가 적은 달에 중위가가 크게 흔들립니다. 12개월 이동평균을 켜면 계절·구성 효과가 줄어 장기 방향이 잘 보입니다. 최근 두 달은 신고가 덜 들어와 그래프에서 뺐습니다.")}
   <div class="chart-slot">${chart({
     xAxis: {data: shown.map((m) => m)}, yAxis: {name: METRICS[metric].unit},
-    series: picked.map((code, i) => ({name: nameOf(code), type: "line", itemStyle: {color: PALETTE[i]}, data: valueOf(code, metric)}))
+    series: picked.map((code, i) => ({name: nameOf(code), type: "line", itemStyle: {color: regionColor(nameOf(code))}, data: valueOf(code, metric)}))
   }, invalidation)}</div>
 </div>
 

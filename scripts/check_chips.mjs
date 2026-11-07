@@ -8,6 +8,7 @@ for (const reduced of [false, true]) {
   run("set", "media", "light", reduced ? "reduced-motion" : "no-preference");
   run("set", "viewport", "390", "844");
   run("open", `${base}/regions`);
+  run("tab", "t1");
   run("wait", ".tabulator");
   run("wait", "--fn", 'document.fonts.status === "loaded"');
   run("wait", "500");

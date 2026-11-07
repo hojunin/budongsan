@@ -19,11 +19,11 @@ export function chart(option, invalidation) {
       const numeric = !["time", "category"].includes(axis.type ?? "value");
       const label = axis.axisLabel ?? {};
       return {
-        type: "value", nameTextStyle: {color: muted, fontSize: 10},
+        type: "value", nameTextStyle: {color: muted, fontSize: 12},
         splitLine: {lineStyle: {color: border, type: "dashed"}}, ...axis,
         axisLabel: {
-          color: muted, fontSize: 10, hideOverlap: true,
-          ...(numeric ? {formatter: (value) => num(value)} : {}), ...label,
+          color: muted, fontSize: 12, hideOverlap: true,
+          ...(numeric ? {formatter: (value) => num(value)} : {}), ...label, fontSize: Math.max(12, Number(label.fontSize) || 12),
           ...(numeric && typeof label.formatter === "string" ? {formatter: (value) => label.formatter.replaceAll("{value}", num(value))} : {})
         },
         axisPointer: {
@@ -38,7 +38,7 @@ export function chart(option, invalidation) {
       color: PALETTE, animation: !motion.matches, animationDuration: 300,
       textStyle: {fontFamily: style.getPropertyValue("--sans-serif").trim(), color: muted},
       aria: {enabled: true},
-      legend: {type: "scroll", top: 0, left: 0, right: 0, textStyle: {color: muted, fontSize: 11}, itemWidth: 14, itemHeight: 7, pageTextStyle: {color: muted}, ...legend},
+      legend: {type: "scroll", top: 0, left: 0, right: 0, textStyle: {color: muted, fontSize: 12}, itemWidth: 14, itemHeight: 7, pageTextStyle: {color: muted}, ...legend},
       tooltip: {trigger: "axis", confine: true, renderMode: "richText", backgroundColor: style.getPropertyValue("--theme-background-alt").trim(), textStyle: {color: muted, fontSize: 12}, axisPointer: {type: "cross"}, valueFormatter: (value) => Array.isArray(value) ? value.map((v, i) => i === 0 && option.xAxis?.type === "time" ? new Date(v).toLocaleDateString("ko-KR") : num(v)).join(" · ") : num(value), ...tooltip},
       toolbox: {top: 28, right: 0, itemSize: 14, iconStyle: {borderColor: muted}, feature: {restore: {title: "초기화"}, saveAsImage: {title: "이미지 저장", pixelRatio: 2}}},
       grid: {left: 8, right: 12, top: 84, bottom: 72, containLabel: true},

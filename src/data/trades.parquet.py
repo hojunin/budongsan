@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from _db import recent
+from _normalize import direct_status
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS = json.loads((ROOT / "src" / "data" / "regions.json").read_text(encoding="utf-8"))
@@ -41,7 +42,7 @@ def load_cache() -> pd.DataFrame:
         "floor": pd.to_numeric(raw["floor"], errors="coerce"),
         "build_year": pd.to_numeric(raw["buildYear"], errors="coerce"),
         "canceled": raw.get("cdealType", pd.Series([""] * len(raw))).astype(str).str.strip().eq("O"),
-        "direct": raw.get("dealingGbn", pd.Series([""] * len(raw))).astype(str).str.contains("직거래"),
+        "direct": direct_status(raw.get("dealingGbn", pd.Series([""] * len(raw)))),
         "buyer": raw.get("buyerGbn", pd.Series([""] * len(raw))).astype(str).str.strip(),
     })
     out["deal_date"] = pd.to_datetime(dict(year=raw["dealYear"].astype(int), month=raw["dealMonth"].astype(int), day=raw["dealDay"].astype(int)), errors="coerce")

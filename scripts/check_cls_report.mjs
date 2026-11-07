@@ -2,7 +2,7 @@
 import {readFileSync} from "node:fs";
 import assert from "node:assert/strict";
 const report = JSON.parse(readFileSync(process.argv[2], "utf8"));
-for (const page of ["/", "/regions", "/complexes", "/market", "/budget", "/about"]) {
+for (const page of ["/", "/regions", "/complexes", "/market", "/budget", "/about", "/personal", "/compare", "/outlook", "/trades", "/longterm", "/buyers", "/news", "/reports/", "/policy"]) {
   const runs = report.results.filter((result) => result.page === page);
   assert.equal(runs.length, 3, `need three valid measurements of ${page}`);
   for (const result of runs) {
@@ -14,4 +14,4 @@ for (const page of ["/", "/regions", "/complexes", "/market", "/budget", "/about
     }
   }
 }
-console.log("PASS initial/full-session CLS budget and interactive layout stability on all six pages (18 runs)");
+console.log("PASS initial/full-session CLS budget and interactive layout stability on all fifteen pages (45 runs)");

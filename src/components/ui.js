@@ -11,7 +11,7 @@ export const COLOR = {
   good: "var(--good)",
   warn: "var(--warn)"
 };
-export const PALETTE = ["#c8553d", "#2a6f97", "#6a994e", "#bc6c25", "#7b5ea7", "#2d8a8a"];
+export {PALETTE, regionColor} from "./colors.js";
 export const BANDS = ["~49", "59", "74", "84", "100", "115+"];
 export const BAND_LABEL = {"~49": "~49㎡", "59": "59㎡대", "74": "74㎡대", "84": "84㎡대", "100": "100㎡대", "115+": "115㎡+"};
 

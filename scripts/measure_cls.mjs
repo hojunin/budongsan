@@ -48,13 +48,16 @@ try {
   instrumentationId = (await send("Page.addScriptToEvaluateOnNewDocument", {source: instrumentation})).identifier;
   await send("Emulation.setEmulatedMedia", {features: [{name: "prefers-color-scheme", value: "light"}, {name: "prefers-reduced-motion", value: "no-preference"}]});
   for (let run = 1; run <= Number(process.argv[4] ?? 3); run++) {
-    for (const page of ["", "regions", "complexes", "market", "budget", "about"]) {
+    for (const page of (process.env.CLS_PAGES ? process.env.CLS_PAGES.split(",") : ["", "regions", "complexes", "market", "budget", "about", "personal", "compare", "outlook", "trades", "longterm", "buyers", "news", "reports/", "policy"])) {
+      await send("Page.navigate", {url: "about:blank"});
+      await delay(800); // 전 페이지 입력이 첫 로딩의 recent-input 판정에 섞이지 않게 한다.
       await send("Page.navigate", {url: `${base}/${page}`});
       const deadline = Date.now() + 45000;
       let ready = false;
       while (Date.now() < deadline) {
         await delay(200);
-        ready = await evaluate(`document.readyState==='complete' && document.fonts.status==='loaded' && ${page === "about" ? '!!document.querySelector("#observablehq-main h2")' : '!!document.querySelector(".interactive-chart svg") && !!document.querySelector(".ts-control")'}`);
+        const selector = ["about", "outlook", "reports/"].includes(page) ? "#observablehq-main h2" : page === "policy" ? "#observablehq-main h1" : page === "personal" ? "#personal-calculate" : ".interactive-chart svg";
+        ready = await evaluate(`document.readyState==='complete' && document.fonts.status==='loaded' && !!document.querySelector(${JSON.stringify(selector)})`);
         if (ready) break;
       }
       await delay(1500);
@@ -76,7 +79,9 @@ try {
         await act("reset table search", 'document.querySelector(".table-toolbar button").click()');
       }
       if (page === "budget") await act("change interest", 'const input=document.querySelector("input[type=number][step=\\"0.05\\"]");input.value=5.5;input.dispatchEvent(new Event("input",{bubbles:true}))');
-      if (page !== "about") {
+      if (page === "personal") await act("edit input", 'const input=document.querySelector("[name=price]");input.value=123;input.dispatchEvent(new Event("input",{bubbles:true}))');
+      if (page === "compare") await act("change band", 'const input=document.querySelectorAll(".compare-filters select")[1];if(input){input.value="59";input.dispatchEvent(new Event("input",{bubbles:true}))}');
+      if (!["about", "personal", "outlook", "reports/", "policy"].includes(page)) {
         await evaluate('document.querySelector(".interactive-chart").scrollIntoView({block:"center"})');
         await delay(200);
         await act("chart zoom and legend", `(async()=>{const url=performance.getEntriesByType('resource').find(r=>r.name.includes('/_npm/echarts@')&&r.name.endsWith('.js'))?.name;const e=await import(url);const chart=e.getInstanceByDom(document.querySelector('.interactive-chart'));chart.dispatchAction({type:'dataZoom',start:25,end:75});if(chart.getOption().series.length)chart.dispatchAction({type:'legendToggleSelect',name:chart.getOption().series[0].name})})()`);

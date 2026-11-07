@@ -102,3 +102,8 @@ with patch('fetch_molit.requests.get', side_effect=[XMLResponse(xml(2,1,row)), X
     else: raise AssertionError('partial pages accepted')
 with patch('fetch_molit.requests.get', return_value=XMLResponse(xml(0,1,''))):
     assert VerifiedAPI('key').get_data('아파트','매매','11110','202410').empty
+for badrow in (row.replace('<excluUseAr>84</excluUseAr>', '<excluUseAr>0</excluUseAr>'), row.replace('<dealAmount>100</dealAmount>', '<dealAmount>알수없음</dealAmount>'), row.replace('<dealDay>1</dealDay>', '<dealDay>99</dealDay>')):
+    with patch('fetch_molit.requests.get', return_value=XMLResponse(xml(1,1,badrow))):
+        try: VerifiedAPI('key').get_data('아파트','매매','11110','202410')
+        except ValueError: pass
+        else: raise AssertionError('invalid DTO accepted')

@@ -101,6 +101,23 @@ def fetch_table(key: str, statbl: str, cycle: str, start: str, by_group: bool = 
     })
 
 
+def save_regions(con, metric, start, df):
+    """응답에 없는 지역은 기존 자료를 유지한다."""
+    if df.empty:
+        return
+    con.register("rone_incoming", df)
+    con.begin()
+    try:
+        con.execute("DELETE FROM rone WHERE metric = ? AND period >= ? AND region_full IN (SELECT DISTINCT region_full FROM rone_incoming)", [metric, start])
+        con.execute("INSERT INTO rone BY NAME SELECT * FROM rone_incoming")
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.unregister("rone_incoming")
+
+
 def main() -> int:
     key = os.environ.get("REB_API_KEY")
     if not key:
@@ -126,14 +143,7 @@ def main() -> int:
             if df.empty:
                 print(f"[rone] {metric}: 검증할 행이 없어 기존 자료를 유지합니다.", file=sys.stderr)
                 continue
-            con.begin()
-            try:
-                con.execute("DELETE FROM rone WHERE metric = ? AND period >= ?", [metric, start])
-                con.execute("INSERT INTO rone BY NAME SELECT * FROM df")
-                con.commit()
-            except Exception:
-                con.rollback()
-                raise
+            save_regions(con, metric, start, df)
             print(f"[rone] {metric}: {len(df)}행, {df['period'].min()}~{df['period'].max()} ({time.time() - t:.0f}초)")
     return 0
 

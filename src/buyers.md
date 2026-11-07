@@ -6,7 +6,7 @@ title: 매수자 분석
 import {chart} from "./components/charts.js";
 import {dataTable} from "./components/table.js";
 import {enhanceUI} from "./components/appearance.js";
-import {heading, num, pct, signed, PALETTE} from "./components/ui.js";
+import {heading, num, pct, signed, PALETTE, regionColor} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const rone = Array.from(await FileAttachment("data/rone.parquet").parquet(), (d) => ({...d, date: new Date(d.date)}))
   .filter((d) => d.metric === "mm_buyer_residence" || d.metric === "mm_buyer_age");
@@ -62,7 +62,7 @@ const line = (key) => picked.map((region, i) => {
     const w = rows.slice(Math.max(0, j - 2), j + 1).map((x) => x[key]).filter((x) => x != null);
     return [+d.date, j >= 2 && w.length === 3 ? w.reduce((a, b) => a + b, 0) / 3 * 100 : null];
   });
-  return {name: label(region), type: "line", itemStyle: {color: PALETTE[i]}, data};
+  return {name: label(region), type: "line", itemStyle: {color: regionColor(region)}, data};
 });
 const pctChart = (key) => chart({xAxis: {type: "time"}, yAxis: {name: "%", axisLabel: {formatter: "{value}%", fontSize: 10}},
   tooltip: {trigger: "axis", confine: true, renderMode: "richText", valueFormatter: (v) => v == null ? "–" : `${num(v)}%`},

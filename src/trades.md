@@ -62,7 +62,7 @@ const monthly = await db.query(`
     quantile_cont(ppm2, 0.75) FILTER (WHERE NOT canceled)      AS ppm2_q3,
     median(price) FILTER (WHERE NOT canceled)                  AS price_med,
     avg(CASE WHEN new_high AND NOT canceled THEN 1 ELSE 0 END) AS new_high_rate,
-    avg(CASE WHEN direct THEN 1 ELSE 0 END)                    AS direct_rate,
+    avg(CASE WHEN direct IS NULL THEN NULL WHEN direct THEN 1 ELSE 0 END)                    AS direct_rate,
     avg(CASE WHEN canceled THEN 1 ELSE 0 END)                  AS cancel_rate
   FROM trades WHERE ${where}
   GROUP BY ym ORDER BY ym`);

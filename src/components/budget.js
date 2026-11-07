@@ -3,7 +3,7 @@
 // 30년 원리금균등 월 상환액
 export function monthlyPayment(loan, ratePct, years = 30) {
   const r = ratePct / 100 / 12, n = years * 12;
-  return r === 0 ? loan / n : (loan * r) / (1 - (1 + r) ** -n);
+  return r === 0 ? loan / n : (loan * r) / -Math.expm1(-n * Math.log1p(r));
 }
 
 // DSR 40% 기준 최대 대출액 (스트레스 금리 반영)

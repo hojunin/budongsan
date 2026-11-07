@@ -6,9 +6,9 @@
   "scripts": {
     "fetch": "python3 scripts/fetch_molit.py && python3 scripts/fetch_kb.py",
     "dev": "observable preview",
-    "build": "observable build && node scripts/duckdb_wasm_cdn.js",
+    "build": "python3 scripts/verify_reports.py && python3 scripts/refresh_loaders.py && observable build && node scripts/duckdb_wasm_cdn.js",
     "clean": "rm -rf dist src/.observablehq/cache",
-    "deploy": "wrangler pages deploy dist --project-name=apt-insight"
+    "deploy": "python3 scripts/verify_public_data.py && wrangler pages deploy dist --project-name=apt-insight"
   },
   "dependencies": {
     "@observablehq/framework": "^1.13.4",

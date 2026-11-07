@@ -11,7 +11,7 @@ const disposeUI = enhanceUI(invalidation);
 
 
 ```js
-import {regionOptions, bandWhere, sinceWhere, sampleTag, num, pct, signed, BANDS, BAND_LABEL, PALETTE} from "./components/ui.js";
+import {regionOptions, bandWhere, sinceWhere, sampleTag, num, pct, signed, BANDS, BAND_LABEL, regionColor} from "./components/ui.js";
 const regions = await FileAttachment("data/regions.json").json();
 const db = await DuckDBClient.of({trades: FileAttachment("data/trades.parquet")});
 const isSample = (await db.queryRow(`SELECT bool_or(is_sample) AS s FROM trades`)).s;
@@ -90,7 +90,7 @@ const comparisonSeries = metrics.flatMap((key, metricIndex) => chosen.slice(0, 6
   const values = series.filter((d) => d.region === r.label);
   const base = values.find((d) => d[key] > 0)?.[key];
   return {name: `${r.label} · ${METRICS[key]}`, type: "line", yAxisIndex: indexed ? 0 : metricIndex,
-    lineStyle: {type: ["solid", "dashed", "dotted", "dashed"][metricIndex], width: 2}, itemStyle: {color: PALETTE[regionIndex]},
+    lineStyle: {type: ["solid", "dashed", "dotted", "dashed"][metricIndex], width: 2}, itemStyle: {color: regionColor(r.label)},
     data: values.map((d) => [d.ym, indexed ? base && d[key] != null ? d[key] / base * 100 : null : d[key] == null ? null : key.endsWith("rate") ? d[key] * 100 : d[key]])};
 }));
 ```

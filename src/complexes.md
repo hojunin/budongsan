@@ -179,12 +179,12 @@ const monthlyMed = d3.rollups(valid, (v) => d3.median(v, (d) => d.price), (d) =>
         markLine: {symbol: "none", label: {position: "insideEndTop", fontSize: 10}, data: [
           {yAxis: 60000, name: "6억 · 디딤돌", label: {formatter: "6억 · 디딤돌"}},
           {yAxis: 90000, name: "9억 · 특례", label: {formatter: "9억 · 특례"}},
-          ...(ask?.median_ask ? [{yAxis: ask.median_ask, label: {formatter: "기록한 호가"}, lineStyle: {type: "solid", color: "#c8553d"}}] : [])
+          ...(ask?.median_ask ? [{yAxis: ask.median_ask, label: {formatter: "기록한 호가"}, lineStyle: {type: "solid", color: "#626b86"}}] : [])
         ]}},
       {name: "전세 중위가", type: "line", data: rentRows.filter((d) => d.band === band).map((d) => [+new Date(d.ym + "-01"), d.dep])}
     ]
   }, invalidation)}</div>
-  <p class="note">점: 개별 실거래 · 선: 월별 중위가 · 실선(빨강): 기록한 호가 중위값 · 점선: 예산선. 디딤돌은 거래가가 아니라 담보 평가액으로 6억을 봅니다.</p>
+  <p class="note">점: 개별 실거래 · 선: 월별 중위가 · 실선(회색): 기록한 호가 중위값 · 점선: 예산선. 디딤돌은 거래가가 아니라 담보 평가액으로 6억을 봅니다.</p>
 </div>
 
 <div class="card grid-1 table-wrap">

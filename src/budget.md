@@ -86,7 +86,7 @@ const maxAffordable = d3.max(curve.filter((d) => d.gap >= 0 && d.eligibleA), (d)
     series: [
       {name: "필요 현금", type: "line", data: curve.map((d) => [d.p, d.need]), areaStyle: {opacity: .08},
         markLine: {symbol: "none", label: {fontSize: 10, position: "insideEndTop"}, data: [
-          {yAxis: cash, label: {formatter: `보유 현금 ${won(cash)}`}, lineStyle: {color: "#2a6f97", type: "solid"}},
+          {yAxis: cash, label: {formatter: `보유 현금 ${won(cash)}`}, lineStyle: {color: "#626b86", type: "solid"}},
           {xAxis: price, label: {formatter: "선택 매수가"}}
         ]},
         markPoint: {symbol: "circle", symbolSize: 9, label: {show: false}, data: maxAffordable ? [{coord: [maxAffordable, scenario({price: maxAffordable, cash, income, rate, product}).need]}] : []}},

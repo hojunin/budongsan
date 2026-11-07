@@ -5,7 +5,7 @@ title: 오늘의 브리핑
 ```js
 import {chart} from "./components/charts.js";
 import {enhanceUI} from "./components/appearance.js";
-import {card, heading, insightList, articleList, PALETTE} from "./components/ui.js";
+import {card, heading, insightList, articleList, regionColor} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const insights = await FileAttachment("data/insights.json").json();
 const articles = await FileAttachment("data/articles.json").json();
@@ -16,9 +16,9 @@ const rone = await FileAttachment("data/rone.parquet").parquet();
 
 <p class="lead">시장 관측과 나의 자금 가정을 구분해 살펴보세요.</p>
 <div class="question-grid">
-  <a class="card" href="./personal"><strong>지금 사도 될까?</strong><br>내 현금과 월 부담을 가정으로 계산</a>
-  <a class="card" href="./market"><strong>가격은 더 오를까?</strong><br>판단 유보 · 가격 흐름과 반대 근거 확인</a>
-  <a class="card" href="./buyers"><strong>사람들은 어떻게 느낄까?</strong><br>확인된 시장 지표와 거래 살펴보기</a>
+  <a class="card" href="./compare"><strong>지금 사도 될까?</strong><br>내 현금과 월 부담을 가정으로 계산</a>
+  <a class="card" href="./outlook"><strong>가격은 더 오를까?</strong><br>판단 유보 · 가격 흐름과 반대 근거 확인</a>
+  <a class="card" href="./market#kb-survey"><strong>사람들은 어떻게 느낄까?</strong><br>확인된 시장 지표와 거래 살펴보기</a>
   <a class="card" href="./policy"><strong>정책은 어떻게 받아들일까?</strong><br>공식 원문과 의견 자료 확인 상태</a>
 </div>
 
@@ -64,7 +64,7 @@ const rebased = regionsWk.map((r) => {
       ${heading("아파트값 3년 흐름 (3년 전 = 100)", "한국부동산원 주간 아파트 매매가격지수를 3년 전 첫 주 100 기준으로 다시 맞춘 값입니다. 같은 집의 가격 변화를 추정한 지수라, 실거래 중위가와 다르게 움직일 수 있습니다.")}
       <div class="chart-slot">${chart({
         xAxis: {data: dates.map((t) => new Date(t).toISOString().slice(0, 10))}, yAxis: {name: "지수", scale: true},
-        series: rebased.map((s, i) => ({...s, type: "line", itemStyle: {color: PALETTE[i]}}))
+        series: rebased.map((s, i) => ({...s, type: "line", itemStyle: {color: regionColor(s.name)}}))
       }, invalidation)}</div>
     </div>
     <div class="card" style="margin-top: var(--gap)">

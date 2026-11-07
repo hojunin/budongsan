@@ -6,6 +6,8 @@ export default {
   pages: [
     {name: "네 가지 질문", path: "/"},
     {name: "내 조건으로 보기", path: "/personal"},
+    {name: "매매와 임대 비교", path: "/compare"},
+    {name: "가격 전망 살펴보기", path: "/outlook"},
     {name: "정책과 의견", path: "/policy"},
     {name: "시장 분석", open: true, pages: [
       {name: "실거래 분석", path: "/trades"},
@@ -25,11 +27,11 @@ export default {
   // 테마(air/near-midnight)와 토큰은 style.css 에서 불러온다. 라이트/다크 자동.
   style: "style.css",
   head: `
-<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14161a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101c25" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23c8553d'/><path d='M8 22V13l8-6 8 6v9h-5v-6h-6v6z' fill='white'/></svg>">`,
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23087f80'/><path d='M8 22V13l8-6 8 6v9h-5v-6h-6v6z' fill='white'/></svg>">`,
   sidebar: true,
   toc: false,
   pager: false,

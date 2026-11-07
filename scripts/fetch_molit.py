@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from decimal import Decimal, InvalidOperation
 import json
 import os
 import re
@@ -77,6 +78,19 @@ class VerifiedAPI:
                 required = {"sggCd", "dealYear", "dealMonth", "dealDay", "excluUseAr", "dealAmount" if kind == "매매" else "deposit"}
                 if not required.issubset(row) or row["sggCd"] != code or row["dealYear"] != year_month[:4] or str(row["dealMonth"]).zfill(2) != year_month[4:]:
                     raise ValueError("MOLIT 행 형식 또는 조회 범위 불일치")
+                try:
+                    dt.date(int(row["dealYear"]), int(row["dealMonth"]), int(row["dealDay"]))
+                    area = Decimal(str(row["excluUseAr"]).strip().replace(",", ""))
+                    amount = Decimal(str(row["dealAmount" if kind == "매매" else "deposit"]).strip().replace(",", ""))
+                    if not area.is_finite() or area <= 0 or not amount.is_finite() or amount < 0:
+                        raise ValueError("MOLIT 단위값 범위 오류")
+                    monthly = row.get("monthlyRent")
+                    if monthly not in (None, ""):
+                        rent = Decimal(str(monthly).strip().replace(",", ""))
+                        if not rent.is_finite() or rent < 0:
+                            raise ValueError("MOLIT 월세 범위 오류")
+                except (ValueError, TypeError, InvalidOperation):
+                    raise ValueError("MOLIT 날짜·금액·면적 오류") from None
                 rows.append(row)
             if len(rows) > total:
                 raise ValueError("MOLIT 전체 건수 초과")

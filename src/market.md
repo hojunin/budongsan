@@ -5,7 +5,7 @@ title: 시장 지표
 ```js
 import {chart} from "./components/charts.js";
 import {enhanceUI} from "./components/appearance.js";
-import {heading, sampleTag, PALETTE} from "./components/ui.js";
+import {heading, sampleTag, regionColor} from "./components/ui.js";
 const disposeUI = enhanceUI(invalidation);
 const rone = Array.from(await FileAttachment("data/rone.parquet").parquet(), (d) => ({...d, date: new Date(d.date)}));
 const kbRaw = await FileAttachment("data/kb.parquet").parquet();
@@ -49,7 +49,7 @@ const series = (metric, {item = null, transform = null} = {}) => picked.map((reg
   let rows = rone.filter((d) => d.metric === metric && d.region_full === region && (!item || d.item === item) && d.date >= since).sort((a, b) => a.date - b.date);
   let data = rows.map((d) => [+d.date, d.value]);
   if (transform === "change") data = data.map(([t, v], j) => [t, j ? (v / data[j - 1][1] - 1) * 100 : null]).slice(1);
-  return {name: label(region), type: "line", itemStyle: {color: PALETTE[i]}, data};
+  return {name: label(region), type: "line", itemStyle: {color: regionColor(region)}, data};
 });
 const roneChart = (metric, {name = "지수", ref = null, refLabel = "", ...opts} = {}) => chart({
   xAxis: {type: "time"}, yAxis: {name, scale: true},
@@ -76,6 +76,8 @@ const roneChart = (metric, {name = "지수", ref = null, refLabel = "", ...opts}
   <div class="card">${heading("아파트 전월세 전환율 (%)", "전세 보증금을 월세로 바꿀 때 적용되는 연 이율입니다. 금리와 함께 보면 월세 전환 압력을 가늠할 수 있습니다.")}<div class="chart-slot">${roneChart("mm_conversion", {name: "%"})}</div></div>
 </div>
 
+<span id="kb-survey"></span>
+
 ## KB 설문 지표
 
 ```js
@@ -84,7 +86,7 @@ const kbPick = picked.map((r) => r.split(">").at(-1)).filter((r) => kbRegions.in
 const kbShown = kbPick.length ? kbPick : kbRegions.filter((r) => ["서울", "경기"].includes(r));
 const kbChart = (metric, {name = "지수", ref = null, refLabel = ""} = {}) => chart({
   xAxis: {type: "time"}, yAxis: {name},
-  series: kbShown.map((region, i) => ({name: region, type: "line", itemStyle: {color: PALETTE[i]},
+  series: kbShown.map((region, i) => ({name: region, type: "line", itemStyle: {color: regionColor(region)},
     data: kb.filter((d) => d.metric === metric && d.region === region && d.date >= since).map((d) => [+d.date, d.value]),
     ...(i === 0 && ref != null ? {markLine: {symbol: "none", data: [{yAxis: ref, label: {formatter: refLabel, position: "insideEndTop", fontSize: 10}}]}} : {})}))
 }, invalidation);

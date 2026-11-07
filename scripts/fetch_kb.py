@@ -14,6 +14,29 @@ DB = ROOT / "data" / "apt.duckdb"
 SIDO = ["11", "41"]  # 서울, 경기
 
 
+def save_partition(con, name, code, df):
+    if name not in {"jeonse_ratio", "buyer_index", "trade_activity"} or code not in SIDO:
+        raise ValueError("잘못된 KB partition")
+    if df.empty or "지역코드" not in df or not df["지역코드"].astype(str).str.startswith(code).all():
+        raise ValueError("KB 지역 partition 불완전")
+    table = f"kb_{name}"
+    con.register("kb_incoming", df)
+    con.begin()
+    try:
+        exists = con.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = ?", [table]).fetchone()[0]
+        if exists:
+            con.execute(f'DELETE FROM {table} WHERE CAST("지역코드" AS VARCHAR) LIKE ?', [code + "%"])
+            con.execute(f"INSERT INTO {table} BY NAME SELECT * FROM kb_incoming")
+        else:
+            con.execute(f"CREATE TABLE {table} AS SELECT * FROM kb_incoming")
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.unregister("kb_incoming")
+
+
 def main() -> int:
     try:
         import duckdb
@@ -34,20 +57,15 @@ def main() -> int:
         "trade_activity": lambda c: api.get_market_trend(메뉴코드="02", 월간주간구분코드="01", 지역코드=c),
     }
     for name, fn in jobs.items():
-        frames = []
         for c in SIDO:
             try:
                 df = fn(c)
-                if df is not None and len(df):
-                    frames.append(df)
+                if df is None or df.empty:
+                    raise ValueError("새 데이터 없음")
+                save_partition(con, name, c, df)
+                print(f"[kb] {name} {c}: {len(df)}행")
             except Exception as e:
-                print(f"[kb] {name} {c} 실패: {e}")
-        if frames:
-            df = pd.concat(frames, ignore_index=True)  # noqa: F841 (duckdb 가 이름으로 읽는다)
-            con.execute(f"CREATE OR REPLACE TABLE kb_{name} AS SELECT * FROM df")
-            print(f"[kb] {name}: {sum(len(f) for f in frames)}행")
-        else:
-            print(f"[kb] {name}: 새 데이터 없음 — 기존 테이블 유지")
+                print(f"[kb] {name} {c} 실패; 기존 지역 유지: {e}")
     con.close()
     return 0
 

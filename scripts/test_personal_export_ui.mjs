@@ -1,0 +1,14 @@
+import {execFileSync} from 'node:child_process';
+import assert from 'node:assert/strict';
+const run=(...args)=>execFileSync('agent-browser',['--session','terra-implementation',...args],{encoding:'utf8',timeout:60000}).trim();
+const read=(expr)=>JSON.parse(JSON.parse(run('eval',`JSON.stringify(${expr})`)));
+run('open',`${process.env.CLS_BASE_URL ?? 'http://127.0.0.1:8766'}/personal`); run('tab','t1'); run('wait','#personal-calculate');
+assert.equal(read(`!!document.querySelector('#scenario-preview')`),true);
+run('eval',`(()=>{for(const [k,v] of Object.entries({price:10000,cash:5000,income:500,living:200,debt:50,housing:30,loan:6000,rate:0,years:10,cost:200,reserve:1000})){const i=document.querySelector('[name="'+k+'"]');i.value=v;i.dispatchEvent(new Event('input',{bubbles:true}))}document.querySelector('#personal-calculate').click()})()`);
+assert.equal(read(`document.querySelector('#scenario-download').disabled`),true);
+run('eval',`document.querySelector('[data-scenario-field="monthly"]').click();document.querySelector('#scenario-preview').click()`);
+assert.match(read(`document.querySelector('#scenario-preview-text').textContent`),/170/);
+assert.equal(read(`document.querySelector('#scenario-download').disabled`),false);
+run('eval',`(()=>{const i=document.querySelector('[name="income"]');i.value=400;i.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+assert.equal(read(`document.querySelector('#scenario-download').disabled`),true);
+console.log('PASS scenario export requires explicit preview and resets');
