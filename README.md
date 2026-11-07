@@ -9,7 +9,7 @@ Python은 3.12를 쓴다. Homebrew 기본 3.15에서는 pandas 2.2.3(PublicDataR
 ```bash
 npm install
 uv venv -p 3.12 .venv && VIRTUAL_ENV=.venv uv pip install -r requirements.txt
-PATH="$PWD/.venv/bin:$PATH" npm run dev   # http://127.0.0.1:3000 — DB가 없으면 '샘플 데이터'로 뜬다
+PATH="$PWD/.venv/bin:$PATH" npm run dev   # http://127.0.0.1:3000 — DB가 없으면 목데이터 태그 표시
 ```
 
 ## 데이터 수집과 배포 (로컬 배치)
@@ -42,10 +42,23 @@ GitHub Actions(`build-check`)는 push·PR마다 샘플 데이터로 빌드만 �
 
 ## 내 리포트 쓰기
 
+비교 화면에서 근거 초안 JSON을 저장한 다음 출처 이용권·수집 완결성·단지 식별을 검토하고 확인자를 기록한다. 미검토·합성 근거는 패키지 생성을 차단한다. 개인 결과는 기본적으로 포함하지 않는다.
+
 ```bash
-.venv/bin/python scripts/new_report.py "11월 첫째 주 서울 아파트 시장"   # content/drafts/ 에 초안
-git mv content/drafts/<초안>.md src/reports/                            # 발행
+.venv/bin/python scripts/new_report.py create evidence-draft.json content/drafts/example
+.venv/bin/python scripts/new_report.py verify content/drafts/example
+.venv/bin/python scripts/new_report.py prepare content/drafts/example example-report
+PATH="$PWD/.venv/bin:$PATH" npm run build
 ```
+
+`prepare`는 고정 패키지와 읽기 페이지를 로컬 리포트 목록에 추가한다. 웹 그래픽·문장 텍스트·세로/가로 SVG는 같은 스냅샷을 사용한다. 명령만으로 공개 배포되지는 않는다. 기존 DB로만 배포하려면 수집 배치를 실행하지 않고 다음 명령을 사용한다.
+
+```bash
+PATH="$PWD/.venv/bin:$PATH" npm run build
+PATH="$PWD/.venv/bin:$PATH" npm run deploy -- --branch main
+```
+
+배포 전 합성·미확인 관측과 고정 리포트 변조를 검사한다. 데이터 이용권이나 완결성을 자동 인증하는 검사는 아니다. [구현 및 제한](docs/reports/2026-11-07-terra-implementation.md)을 확인한다.
 
 ## 자주 바꾸는 파일
 

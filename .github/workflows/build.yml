@@ -21,12 +21,24 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python scripts/test_fetch_molit.py
       - run: python scripts/test_fetch_rone.py
+      - name: Check data and report boundaries
+        run: |
+          python scripts/test_partition_preservation.py
+          python scripts/test_normalization.py
+          python scripts/test_loader_cache.py
+          python scripts/test_public_data.py
+          python scripts/test_report_package.py
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: node --test scripts/test_format.mjs
+      - name: Check scenarios and graphics
+        run: |
+          node scripts/test_personal.mjs
+          node scripts/test_graphics.mjs
+          node scripts/test_colors.mjs
       - run: npm run build
       - name: Check file sizes (Cloudflare Pages 25 MiB/파일)
         run: find dist -type f -size +24M -print -exec false {} +
