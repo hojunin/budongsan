@@ -29,6 +29,15 @@ def format_value(value):
     return f'{result:,.2f}'.rstrip('0').rstrip('.')
 
 
+def area_condition(q):
+    if q.get('area_min') is None and q.get('area_max') is None:
+        return ''
+    a, b = q.get('area_min'), q.get('area_max')
+    if type(a) not in (int,float) or type(b) not in (int,float) or not math.isfinite(a) or not math.isfinite(b) or not 0 < a <= b:
+        raise ValueError('전용면적 범위 오류')
+    return f"전용면적 {format_value(a)}–{format_value(b)}㎡"
+
+
 def validate_report(template, title, summary, evidence, scenario=None):
     if template not in TEMPLATES or not title.strip() or not summary.strip() or not evidence:
         raise ValueError('제목·요약·템플릿·근거가 필요합니다')
@@ -47,6 +56,7 @@ def validate_report(template, title, summary, evidence, scenario=None):
             raise ValueError('HTTPS 출처 필요')
         if not e.get('facts') or any(not isinstance(f.get('label'), str) or not f['label'].strip() or type(f.get('value')) not in (int, float) or not math.isfinite(f['value']) for f in e['facts']):
             raise ValueError('유한한 숫자 근거 필요')
+        area_condition(e.get('query_spec', {}))
         if len({f['label'] for f in e['facts']}) != len(e['facts']):
             raise ValueError('중복 지표 이름')
     if template == 'weekly':
@@ -55,14 +65,46 @@ def validate_report(template, title, summary, evidence, scenario=None):
         if len(periods) != 2 or any(e['sample_n'] is None or e['sample_n'] < 30 or not {'Q25','중간값','Q75'} <= {f['label'] for f in e['facts']} for e in periods):
             raise ValueError('기간별 30건 이상의 가격 분포 두 개가 필요합니다')
         a, b = periods
+        for period in periods:
+            values = {f['label']: f['value'] for f in period['facts']}
+            if not 0 < values['Q25'] <= values['중간값'] <= values['Q75']:
+                raise ValueError('분포 표본 또는 분위수 오류')
         keys = ('region', 'band', 'canceled_excluded')
         qa, qb = a.get('query_spec', {}), b.get('query_spec', {})
         if not qa.get('region') or not qa.get('band') or qa.get('canceled_excluded') is not True or any(qa.get(k) != qb.get(k) for k in keys) or a['source_id'] != b['source_id'] or a['unit'] != b['unit'] or a['period'] == b['period']:
             raise ValueError('기간 비교의 지역·면적·출처·단위 불일치')
+    if template == 'weekly':
+        previous, current = periods
+        for e in evidence:
+            if e.get('kind') not in ('change_comparison', 'relative_spread', 'relative_spread_change'): continue
+            q = e.get('query_spec', {})
+            values = {f['label']: f['value'] for f in e['facts']}
+            if e['source_id'] != previous['source_id'] or e['scope'] != previous['scope'] or e['unit'] != ('%p' if e['kind'] == 'relative_spread_change' else '%') or q.get('region') != qa['region'] or q.get('band') != qa['band']:
+                raise ValueError('파생 근거의 범위·출처 불일치')
+            if e['kind'] == 'change_comparison':
+                prev = {f['label']:f['value'] for f in previous['facts']}; curr = {f['label']:f['value'] for f in current['facts']}
+                if e.get('chart_spec') != {'type':'quadrant','x':'거래수 변화','y':'㎡당 중간가격 변화'} or q.get('baseline_n') != previous['sample_n'] or q.get('current_n') != current['sample_n'] or e['sample_n'] != current['sample_n'] or set(values) != {'거래수 변화','㎡당 중간가격 변화'}:
+                    raise ValueError('4분면 근거 정의 오류')
+                expected = {'거래수 변화':(current['sample_n']/previous['sample_n']-1)*100, '㎡당 중간가격 변화':(curr['중간값']/prev['중간값']-1)*100}
+            elif e['kind'] == 'relative_spread':
+                ref = next((p for p in periods if p['id'] == q.get('reference_id')), None)
+                if ref is None or e['period'] != ref['period'] or e['sample_n'] != ref['sample_n'] or q.get('formula') != '(Q75-Q25)/중간값' or set(values) != {'중간값 대비 구간 폭'}:
+                    raise ValueError('상대 분포폭 근거 정의 오류')
+                facts = {f['label']:f['value'] for f in ref['facts']}
+                expected = {'중간값 대비 구간 폭':(facts['Q75']-facts['Q25'])/facts['중간값']*100}
+            else:
+                if q.get('baseline_n') != previous['sample_n'] or q.get('current_n') != current['sample_n'] or e['sample_n'] != current['sample_n'] or q.get('formula') != '두 기간 상대 구간 폭의 차이' or set(values) != {'상대 구간 폭 변화'}:
+                    raise ValueError('상대 분포폭 변화 근거 정의 오류')
+                prev = {f['label']:f['value'] for f in previous['facts']}; curr = {f['label']:f['value'] for f in current['facts']}
+                expected = {'상대 구간 폭 변화':((curr['Q75']-curr['Q25'])/curr['중간값']-(prev['Q75']-prev['Q25'])/prev['중간값'])*100}
+            if any(not math.isclose(values[k], v, rel_tol=1e-9, abs_tol=1e-9) for k,v in expected.items()):
+                raise ValueError('파생 근거와 원값 불일치')
     if template == 'rent':
         for e in evidence:
             if e.get('kind') == 'jeonse_distribution': continue
             q = e.get('query_spec', {})
+            if e.get('chart_spec') is not None and e['chart_spec'] != {'type':'scatter','x':'보증금','y':'월세'}:
+                raise ValueError('임대 산점도 축 정의 오류')
             vals = [q.get(k) for k in ('deposit','monthly','annual_rate')]
             facts = {f['label']: f['value'] for f in e['facts']}
             if any(type(v) not in (int,float) or not math.isfinite(v) or v < 0 for v in vals) or not {'실제 월세','가정 환산 월비용'} <= facts.keys():
@@ -129,7 +171,7 @@ def render_export_svg(title, cards, all_cards, width, height):
     title_lines = textwrap.wrap(title, width=26 if width < height else 27) or ['리포트']
     if len(title_lines) > 2: raise ValueError('이미지 제목이 너무 깁니다')
     for i, line in enumerate(title_lines): out.append(f'<text x="{margin}" y="{55 + i*48}" font-size="{font_size}" fill="#1e293b">{esc(line)}</text>')
-    top = 120
+    top = 110 if len(title_lines) == 1 else 160
     for i, e in enumerate(cards):
         x = margin + i * (card_width + gap); y = top
         out.append(f'<rect x="{x}" y="{y}" width="{card_width}" height="{height-top-margin}" rx="14" fill="white" stroke="#cbd5d7"/>')
@@ -139,6 +181,9 @@ def render_export_svg(title, cards, all_cards, width, height):
         for key, label, unit in [('budget','집값 상한','만원'),('deposit','보증금','만원'),('monthly','실제 월세','만원'),('annual_rate','가정 연 금리','%')]:
             if q.get(key) is not None: conditions.append(f"{label} {format_value(q[key])}{unit}")
         if q.get('canceled_excluded') is True: conditions.append('취소 제외')
+        if area_condition(q): conditions.append(area_condition(q))
+        if q.get('baseline_n') is not None and q.get('current_n') is not None: conditions.append(f"전년 {q['baseline_n']}건 · 최근 {q['current_n']}건")
+        if q.get('formula'): conditions.append(str(q['formula']))
         sample_line = '확률 없는 사용자 가정' if e['source_id'] == '개인 가정' else f"표본 {sample_text} · {e['unit']} · 출처 {e['source_id']}"
         metadata = [e['scope'], e['period'], sample_line, e['source_url'], " · ".join(conditions)]
         lines = []
@@ -154,7 +199,16 @@ def render_export_svg(title, cards, all_cards, width, height):
             out.append(f'<text x="{x+20}" y="{yy}" font-size="{font_size}" fill="#087f80">{esc(line)}</text>'); yy += line_step
         for line in lines:
             out.append(f'<text x="{x+20}" y="{yy}" font-size="{font_size}" fill="#1e293b">{esc(line)}</text>'); yy += line_step
-        if e['source_id'] != '개인 가정':
+        if e.get('kind') == 'change_comparison':
+            facts = {f['label']:f['value'] for f in e['facts']}
+            limit = max(abs(facts['거래수 변화']), abs(facts['㎡당 중간가격 변화']), 1) * 1.2
+            size = min(card_width - 60, height - margin - yy - 30, 360)
+            if size < 50: raise ValueError('4분면을 출력할 공간이 없습니다')
+            cx, cy = x + 30 + size/2, yy + size/2
+            px = cx + (facts['거래수 변화']/limit)*size/2
+            py = cy - (facts['㎡당 중간가격 변화']/limit)*size/2
+            out.append(f'<g data-quadrant="true"><line x1="{cx-size/2}" x2="{cx+size/2}" y1="{cy}" y2="{cy}" stroke="#475569" stroke-width="4"/><line x1="{cx}" x2="{cx}" y1="{cy-size/2}" y2="{cy+size/2}" stroke="#475569" stroke-width="4"/><circle cx="{px}" cy="{py}" r="10" fill="#087f80"/></g>')
+        elif e['source_id'] != '개인 가정':
             budgets = [other.get('query_spec', {}).get('budget') or 0 for other in all_cards if other['unit'] == e['unit']]
             scale = max([abs(f['value']) for other in all_cards if other['unit'] == e['unit'] for f in other['facts']] + budgets + [1])
             span = max(0, card_width - 40)
@@ -166,9 +220,12 @@ def render_export_svg(title, cards, all_cards, width, height):
                 if q.get('budget') is not None:
                     out.append(f'<line x1="{position(q["budget"])}" x2="{position(q["budget"])}" y1="{yy-4}" y2="{yy+28}" stroke="#c23531" stroke-width="4"/>')
             else:
+                zero = x + 20 + span / 2
+                out.append(f'<line data-zero-axis="true" x1="{zero}" x2="{zero}" y1="{yy}" y2="{yy+len(e["facts"])*28}" stroke="#475569" stroke-width="3"/>')
                 for j, fact in enumerate(e['facts']):
-                    bar_width = span * abs(fact['value']) / scale
-                    out.append(f'<rect data-fact-bar="true" x="{x+20}" y="{yy+6+j*28}" width="{bar_width}" height="12" fill="{["#087f80", "#8b5ba7", "#a46b1c"][j]}"/>')
+                    bar_width = (span / 2) * abs(fact['value']) / scale
+                    left = zero - bar_width if fact['value'] < 0 else zero
+                    out.append(f'<rect data-fact-bar="true" x="{left}" y="{yy+6+j*28}" width="{bar_width}" height="12" fill="{["#087f80", "#8b5ba7", "#a46b1c"][j]}"/>')
     out.append('</svg>')
     return '\n'.join(out).encode()
 
@@ -186,8 +243,10 @@ def create_package(path, template, title, summary, evidence, scenario=None):
         q = e.get('query_spec', {})
         if template == 'rent' and e.get('kind') != 'jeonse_distribution':
             return f"보증금 {fmt(q['deposit'])}만원 · 실제 월세 {fmt(q['monthly'])}만원 · 가정 연 {fmt(q['annual_rate'])}%"
-        if template == 'buyer' and q.get('budget') is not None:
-            return f"집값 상한 {fmt(q['budget'])}만원 · 세로선"
+        if template == 'buyer':
+            parts = ([f"집값 상한 {fmt(q['budget'])}만원 · 세로선"] if q.get('budget') is not None else [])
+            if area_condition(q): parts.append(area_condition(q))
+            return ' · '.join(parts)
         return ''
     details = [line for e in evidence for line in textwrap.wrap(f'{e["scope"]} · {e["period"]} · n={e["sample_n"] if e["sample_n"] is not None else '미공표'} · {e["unit"]} · {e["source_id"]} · {e["source_url"]} · {condition(e)}', width=23)]
     plot_height = 65 + (len(evidence) * 105 if ranges else len(rows) * 86)
@@ -277,7 +336,7 @@ __EXPORT_DECLARATIONS__
 const summaryExport = await FileAttachment("./__SLUG__/summary.txt").url();
 ```
 
-${html`<h1>${report.title}</h1><p class="lead">${report.summary}</p><img src=${picture} alt="발행 시점에 고정한 근거 그래픽"><h2>템플릿 근거</h2><ul>${report.blocks.map((b) => html`<li>${b.title}: ${b.text ?? (b.status === "available" ? "자료 있음" : "자료 없음")}</li>`)}</ul><p>${exportLinks.map((e) => html`<a href=${e.url} download>${e.label}</a> `)} · <a href=${summaryExport} download>문장 텍스트</a></p><h2>근거 숫자</h2><table class="compare-table" tabindex="0"><thead><tr><th>범위와 항목</th><th>값</th><th>표본</th></tr></thead><tbody>${report.evidence.flatMap((e) => e.facts.map((f) => html`<tr><th>${e.scope} · ${f.label}</th><td data-label="값">${num(f.value)} ${e.unit}</td><td data-label="표본">${e.sample_n ?? "미공표"}</td></tr>`))}</tbody></table>${report.scenario ? html`<h2>개인 가정 · 명시적 포함</h2><p>${report.scenario.fields.map((f) => `${f.label} ${num(f.value)}${f.unit}`).join(" · ")}</p>` : ""}<h2>조건과 출처</h2><ul>${report.evidence.map((e) => html`<li>${e.scope} · ${e.period} · n=${e.sample_n ?? "미공표"} · <a href=${e.source_url}>${e.source_id}</a>${report.template === "rent" && e.kind !== "jeonse_distribution" ? ` · 보증금 ${num(e.query_spec.deposit)}만원 · 실제 월세 ${num(e.query_spec.monthly)}만원 · 가정 연 ${num(e.query_spec.annual_rate)}%` : report.template === "buyer" && e.query_spec?.budget != null ? ` · 집값 상한 ${num(e.query_spec.budget)}만원 · 세로선` : ""}</li>`)}</ul>`}
+${html`<h1>${report.title}</h1><p class="lead">${report.summary}</p><img src=${picture} alt="발행 시점에 고정한 근거 그래픽"><h2>템플릿 근거</h2><ul>${report.blocks.map((b) => html`<li>${b.title}: ${b.text ?? (b.status === "available" ? "자료 있음" : "자료 없음")}</li>`)}</ul><p>${exportLinks.map((e) => html`<a href=${e.url} download>${e.label}</a> `)} · <a href=${summaryExport} download>문장 텍스트</a></p><h2>근거 숫자</h2><table class="compare-table" tabindex="0"><thead><tr><th>범위와 항목</th><th>값</th><th>표본</th></tr></thead><tbody>${report.evidence.flatMap((e) => e.facts.map((f) => html`<tr><th>${e.scope} · ${f.label}</th><td data-label="값">${num(f.value)} ${e.unit}</td><td data-label="표본">${e.sample_n ?? "미공표"}</td></tr>`))}</tbody></table>${report.scenario ? html`<h2>개인 가정 · 명시적 포함</h2><p>${report.scenario.fields.map((f) => `${f.label} ${num(f.value)}${f.unit}`).join(" · ")}</p>` : ""}<h2>조건과 출처</h2><ul>${report.evidence.map((e) => html`<li>${e.scope} · ${e.period} · n=${e.sample_n ?? "미공표"} · <a href=${e.source_url}>${e.source_id}</a>${report.template === "rent" && e.kind !== "jeonse_distribution" ? ` · 보증금 ${num(e.query_spec.deposit)}만원 · 실제 월세 ${num(e.query_spec.monthly)}만원 · 가정 연 ${num(e.query_spec.annual_rate)}%` : report.template === "buyer" && e.query_spec?.budget != null ? ` · 집값 상한 ${num(e.query_spec.budget)}만원 · 세로선` : ""}${e.query_spec?.area_min != null && e.query_spec?.area_max != null ? ` · 전용면적 ${num(e.query_spec.area_min)}–${num(e.query_spec.area_max)}㎡` : ""}</li>`)}</ul>`}
 
 <p>관측값은 현재 매물, 대출 승인 또는 보증금 안전성을 뜻하지 않습니다.</p>
 """.replace('__SLUG__', slug).replace('__EXPORT_DECLARATIONS__', 'const exportLinks = [' + ','.join('{label:' + json.dumps(name, ensure_ascii=False) + ',url:await FileAttachment(' + json.dumps('./' + slug + '/' + name) + ').url()}' for name in export_names(report['evidence'], report.get('scenario'))) + '];')

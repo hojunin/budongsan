@@ -239,3 +239,51 @@ with tempfile.TemporaryDirectory() as d:
     try: create_package(Path(d)/'bad','weekly','t','s',[a,b,j])
     except ValueError: pass
     else: raise AssertionError('inverted weekly jeonse accepted')
+with tempfile.TemporaryDirectory() as d:
+    e=evidence() | {'query_spec':{'budget':100000,'area_min':59.12,'area_max':59.98}}
+    p=Path(d)/'area'; create_package(p,'buyer','t','s',[e])
+    for name in ('index.html','summary.txt','card-1080x1350.svg','chart-1600x900.svg'):
+        text=(p/name).read_text()
+        assert '59.12' in text and '59.98' in text
+with tempfile.TemporaryDirectory() as d:
+    base=evidence() | {'kind':'trade_distribution','sample_n':30,'unit':'만원/㎡','query_spec':{'region':'서울','band':'84','canceled_excluded':True}}
+    a=base | {'id':'previous','period':'2025-01–2025-03','facts':[{'label':'Q25','value':100},{'label':'중간값','value':200},{'label':'Q75','value':300}]}
+    b=base | {'id':'current','period':'2026-01–2026-03','facts':[{'label':'Q25','value':120},{'label':'중간값','value':240},{'label':'Q75','value':360}]}
+    c=evidence() | {'id':'change','kind':'change_comparison','unit':'%','sample_n':30,'period':'두 기간','query_spec':{'region':'서울','band':'84','baseline_n':30,'current_n':30},'chart_spec':{'type':'quadrant','x':'거래수 변화','y':'㎡당 중간가격 변화'},'facts':[{'label':'거래수 변화','value':0},{'label':'㎡당 중간가격 변화','value':20}]}
+    spread=evidence() | {'id':'spread','kind':'relative_spread','unit':'%','sample_n':30,'period':a['period'],'query_spec':{'region':'서울','band':'84','reference_id':'previous','formula':'(Q75-Q25)/중간값'},'facts':[{'label':'중간값 대비 구간 폭','value':100}]}
+    p=Path(d)/'weekly-derived'; create_package(p,'weekly','주간','요약',[a,b,c,spread]); assert verify_package(p)
+    saved=json.loads((p/'report.json').read_text())
+    assert saved['evidence'][2]['chart_spec']['type']=='quadrant' and saved['evidence'][3]['facts'][0]['value']==100
+    assert 'data-quadrant="true"' in (p/'card-1080x1350-3.svg').read_text()
+    for index, replacement in [(2,c | {'facts':[{'label':'거래수 변화','value':99},{'label':'㎡당 중간가격 변화','value':20}]}), (3,spread | {'facts':[{'label':'중간값 대비 구간 폭','value':99}]})]:
+        rows=[a,b,c,spread]; rows[index]=replacement
+        try: create_package(Path(d)/f'bad-derived-{index}','weekly','t','s',rows)
+        except ValueError: pass
+        else: raise AssertionError('incorrect derived evidence accepted')
+with tempfile.TemporaryDirectory() as d:
+    base=evidence() | {'kind':'trade_distribution','sample_n':30,'unit':'만원/㎡','query_spec':{'region':'서울','band':'84','canceled_excluded':True}}
+    a=base | {'id':'previous','period':'2025-01–2025-03','facts':[{'label':'Q25','value':100},{'label':'중간값','value':200},{'label':'Q75','value':300}]}
+    b=base | {'id':'current','period':'2026-01–2026-03','facts':[{'label':'Q25','value':200},{'label':'중간값','value':300},{'label':'Q75','value':400}]}
+    difference=evidence() | {'id':'spread-change','kind':'relative_spread_change','unit':'%p','sample_n':30,'period':'두 기간','query_spec':{'region':'서울','band':'84','baseline_n':30,'current_n':30,'formula':'두 기간 상대 구간 폭의 차이'},'facts':[{'label':'상대 구간 폭 변화','value':-100/3}]}
+    p=Path(d)/'difference'; create_package(p,'weekly','t','s',[a,b,difference]); assert verify_package(p)
+    bad=difference | {'facts':[{'label':'상대 구간 폭 변화','value':0}]}
+    try: create_package(Path(d)/'bad-difference','weekly','t','s',[a,b,bad])
+    except ValueError: pass
+    else: raise AssertionError('wrong spread difference accepted')
+with tempfile.TemporaryDirectory() as d:
+    e=evidence() | {'kind':'price_index','sample_n':None,'unit':'지수','facts':[{'label':'변화','value':-10}]}
+    from report_package import render_export_svg
+    import xml.etree.ElementTree as ET
+    svg=ET.fromstring(render_export_svg('t',[e],[e],1600,900))
+    zero=next(x for x in svg if x.attrib.get('data-zero-axis')=='true')
+    bar=next(x for x in svg if x.attrib.get('data-fact-bar')=='true')
+    assert float(bar.attrib['x']) < float(zero.attrib['x1'])
+with tempfile.TemporaryDirectory() as d:
+    q={'deposit':10000,'monthly':50,'annual_rate':4}
+    e=evidence() | {'kind':'rent_contract','unit':'만원/월','sample_n':1,'query_spec':q,'chart_spec':{'type':'scatter','x':'보증금','y':'월세'},'facts':[{'label':'실제 월세','value':50},{'label':'가정 환산 월비용','value':50+10000*4/1200}]}
+    p=Path(d)/'rent-scatter'; create_package(p,'rent','t','s',[e]); assert verify_package(p)
+    assert json.loads((p/'report.json').read_text())['evidence'][0]['chart_spec']['x']=='보증금'
+    bad=e | {'chart_spec':{'type':'scatter','x':'월세','y':'보증금'}}
+    try: create_package(Path(d)/'bad-rent-scatter','rent','t','s',[bad])
+    except ValueError: pass
+    else: raise AssertionError('swapped scatter dimensions accepted')

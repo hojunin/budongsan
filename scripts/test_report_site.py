@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='apt-insight-site-') as tmp:
     for name in ('package.json','observablehq.config.js'):
         shutil.copyfile(ROOT/name,root/name)
     (root/'node_modules').symlink_to(ROOT/'node_modules',target_is_directory=True)
-    base=evidence(); sale=base | {'id':'sale','kind':'trade_distribution'}
+    base=evidence(); sale=base | {'id':'sale','kind':'trade_distribution','query_spec':{'area_min':59.12,'area_max':59.98}}
     rent=base | {'id':'jeonse','kind':'jeonse_distribution','source_id':'rent','release_id':'fixture-rent'}
     q={'deposit':12000,'monthly':50,'annual_rate':4}
     contract=rent | {'id':'contract','kind':'rent_contract','sample_n':1,'unit':'만원/월','query_spec':q,'facts':[{'label':'실제 월세','value':50},{'label':'가정 환산 월비용','value':90}]}
@@ -55,6 +55,8 @@ with tempfile.TemporaryDirectory(prefix='apt-insight-site-') as tmp:
             assert result['title']=='합성 제목 ${1+1}' and result['errors']==[] and result['image'] and result['exports']>=5, (name,result)
             if name == 'weekly':
                 assert '미공표' in browser('eval', "document.querySelector('#observablehq-main').innerText")
+            if name == 'buyer':
+                assert '59.12–59.98㎡' in browser('eval', "document.querySelector('#observablehq-main').innerText")
     finally:
         server.terminate(); server.wait(timeout=5)
     print('PASS synthetic weekly/buyer/rent package → list → site build and browser')

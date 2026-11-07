@@ -31,7 +31,7 @@ run('eval',`document.querySelector('#personal-calculate').focus()`); run('press'
 assert.match(read(`document.querySelector('#personal-result').textContent`),/월 잔여 70만원/);
 assert.equal(read(`location.search`),'');
 console.log('PASS personal invalidation and keyboard calculation');
-run('open',`${base}/compare`); run('tab','t1'); run('wait','--fn', `document.querySelectorAll('.interactive-chart svg').length === 5 && document.querySelectorAll('.compare-filters .ts-control').length === 3 && !!document.querySelector('.compare-period')?.textContent.includes('기간')`);
+run('open',`${base}/compare`); run('tab','t1'); run('wait','--fn', `document.querySelectorAll('.interactive-chart svg').length >= 6 && document.querySelectorAll('.compare-filters .ts-control').length === 3 && !!document.querySelector('.compare-period')?.textContent.includes('기간')`);
 run('eval',`document.querySelector('.chart-info summary').focus()`);
 const wasOpen=read(`document.querySelector('.chart-info').open`); run('press','Enter');
 assert.equal(read(`document.querySelector('.chart-info').open`),!wasOpen);
