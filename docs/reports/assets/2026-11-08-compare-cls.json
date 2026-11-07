@@ -1,0 +1,79 @@
+{
+  "conditions": {
+    "viewport": "390x844",
+    "dpr": 3,
+    "cpuSlowdown": 4,
+    "network": "9 Mbps / 50ms latency",
+    "baseURL": "http://127.0.0.1:8766",
+    "browserCache": "disabled",
+    "interactions": "programmatic, no recent-input exclusion benefit"
+  },
+  "results": [
+    {
+      "run": 1,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "entries": [],
+        "errors": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    }
+  ]
+}
