@@ -59,14 +59,15 @@ def save(con: duckdb.DuckDBPyConnection, kind: str, sgg: str, ym: str, df: pd.Da
     table = TABLE[kind]
     df = pd.DataFrame() if df is None else df
     # 응답 컬럼 타입이 달마다 흔들리지 않도록 원본은 문자열로 둔다. 숫자 변환은 데이터 로더가 한다.
-    df = df.astype("string").assign(_sgg=sgg, _ym=ym)
+    df = df.assign(_sgg=sgg, _ym=ym).astype("string")
     con.begin()
     try:
         exists = con.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = ?", [table]).fetchall()[0][0]
         if len(df.columns) > 2 or exists:
             con.register("incoming", df)
-            if not exists:
-                con.execute(f"CREATE TABLE {table} AS SELECT * FROM incoming LIMIT 0")
+            if not exists:  # 타입을 응답에서 추론하면 행 0개짜리 응답일 때 "NULL" 타입 컬럼이 생긴다
+                cols = ", ".join(f'"{c}" VARCHAR' for c in df.columns)
+                con.execute(f"CREATE TABLE {table} ({cols})")
             have = {r[0] for r in con.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table}'").fetchall()}
             for col in df.columns.difference(list(have)):
                 con.execute(f'ALTER TABLE {table} ADD COLUMN "{col}" VARCHAR')

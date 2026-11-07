@@ -48,4 +48,19 @@ con2 = duckdb.connect()
 s = collect(FakeAPI(), con2, {"trade": ["11110", "11140"]}, months, refresh=0, budget=3, pause=0, backoff=0)
 assert s["trade"]["calls"] == 3, s
 assert con2.execute("SELECT count(DISTINCT ym) FROM fetch_log").fetchall()[0][0] == 2  # 최신 달부터 채운다
+
+
+class EmptyFirstAPI(FakeAPI):
+    """실제 API처럼 이번 달은 컬럼만 있고 행이 0개인 프레임을 준다."""
+    def get_data(self, _prop, kind, code, year_month, translate):
+        if year_month == "202410":
+            return pd.DataFrame(columns=["sggCd", "dealAmount", "dealYear", "aptSeq"])
+        return super().get_data(_prop, kind, code, year_month, translate)
+
+
+con3 = duckdb.connect()
+s = collect(EmptyFirstAPI(), con3, {"trade": ["11140"]}, months, refresh=0, pause=0, backoff=0)
+assert s["trade"] == {"calls": 3, "failed": 0}, s
+assert {t for _, t in con3.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'molit_trade'").fetchall()} == {"VARCHAR"}
+assert con3.execute("SELECT count(*) FROM molit_trade").fetchall()[0][0] == 2
 print("ok")
