@@ -1,0 +1,22 @@
+{
+  "name": "apt-insight",
+  "private": true,
+  "type": "module",
+  "description": "신혼 첫 집 매수 판단용 아파트 실거래·시장 대시보드 (Observable Framework, Cloudflare Pages)",
+  "scripts": {
+    "fetch": "python3 scripts/fetch_molit.py && python3 scripts/fetch_kb.py",
+    "dev": "observable preview",
+    "build": "observable build",
+    "clean": "rm -rf dist src/.observablehq/cache",
+    "deploy": "wrangler pages deploy dist --project-name=apt-insight"
+  },
+  "dependencies": {
+    "@observablehq/framework": "^1.13.4"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

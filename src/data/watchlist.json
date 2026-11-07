@@ -1,0 +1,12 @@
+[
+  {"id": "sanggye12", "name": "상계주공12단지", "match": "상계주공12", "sgg": "11350", "umd": "상계동", "track": "A", "station": "7호선 마들", "commute": "40~45분"},
+  {"id": "alpheim", "name": "두산알프하임", "match": "두산알프하임", "sgg": "41360", "umd": "호평동", "track": "A", "station": "경춘선", "commute": "55~65분"},
+  {"id": "dongbaek-lotte1", "name": "신동백롯데캐슬에코1단지", "match": "신동백롯데캐슬에코1", "sgg": "41463", "umd": "중동", "track": "A", "station": "용인에버라인", "commute": "65~75분"},
+  {"id": "sanggye16", "name": "상계주공16단지", "match": "상계주공16", "sgg": "11350", "umd": "상계동", "track": "B", "station": "7호선 마들", "commute": "40~45분"},
+  {"id": "sinnae6", "name": "신내6단지", "match": "신내6", "sgg": "11260", "umd": "신내동", "track": "B", "station": "6호선 봉화산", "commute": "45~55분"},
+  {"id": "guri-jugong41", "name": "구리 주공4-1단지", "match": "주공4-1", "sgg": "41310", "umd": "인창동", "track": "B", "station": "확인 필요", "commute": "35~45분"},
+  {"id": "dasan-hamoro", "name": "다산해모로", "match": "다산해모로", "sgg": "41360", "umd": "다산동", "track": "B", "station": "확인 필요", "commute": "45~55분"},
+  {"id": "seongnam-xi", "name": "성남자이", "match": "성남자이", "sgg": "41133", "umd": "하대원동", "track": "B", "station": "8호선", "commute": "45~55분"},
+  {"id": "parkciel", "name": "파크시엘", "match": "파크시엘", "sgg": "41463", "umd": "신갈동", "track": "B", "station": "확인 필요", "commute": "55~65분"},
+  {"id": "gm-humansia3", "name": "광명역세권휴먼시아3단지", "match": "광명역세권휴먼시아3", "sgg": "41210", "umd": "소하동", "track": "B", "station": "확인 필요", "commute": "60~75분"}
+]
