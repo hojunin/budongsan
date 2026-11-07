@@ -4,7 +4,9 @@ export default {
   root: "src",
   output: "dist",
   pages: [
-    {name: "오늘의 브리핑", path: "/"},
+    {name: "네 가지 질문", path: "/"},
+    {name: "내 조건으로 보기", path: "/personal"},
+    {name: "정책과 의견", path: "/policy"},
     {name: "시장 분석", open: true, pages: [
       {name: "실거래 분석", path: "/trades"},
       {name: "지역 비교", path: "/regions"},

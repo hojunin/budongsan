@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {personalScenario} from "../src/components/personal.js";
+const v = {price:10000,cash:5000,income:500,living:200,debt:50,housing:30,loan:6000,rate:0,years:10,cost:200,reserve:1000};
+const r = personalScenario(v);
+assert.equal(r.cash, 800);
+assert.equal(r.cashGap, -200);
+assert.equal(r.monthly, 170);
+assert.ok(r.stress2 < r.stress1 && r.stress1 < r.monthly);
+assert.equal(personalScenario({...v,income:""}), null);
+assert.equal(personalScenario({...v,loan:10001}), null);
+assert.equal(personalScenario({...v,years:0}), null);
+assert.equal(personalScenario({...v,living:-1}), null);
+console.log("ok");

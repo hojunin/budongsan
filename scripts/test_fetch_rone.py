@@ -13,6 +13,9 @@ ROWS = [
 
 
 class Resp:
+    def raise_for_status(self):
+        pass
+
     def json(self):
         return {"SttsApiTblData": [{"head": [{"list_total_count": len(ROWS)}]}, {"row": ROWS}]}
 
@@ -24,3 +27,16 @@ assert list(out.region_full) == ["서울", "서울>강북지역>도심권>종로
 assert list(out.item) == ["30대", "지수"]
 assert f.redact("url?KEY=abc123&Type=json") == "url?KEY=***&Type=json"
 print("ok")
+
+class PartialResp(Resp):
+    def __init__(self, row): self.row = row
+    def json(self):
+        return {"SttsApiTblData": [{"head": [{"list_total_count": 2}]}, {"row": self.row}]}
+responses = iter([PartialResp([ROWS[0]]), PartialResp([])])
+f.requests.get = lambda *a, **k: next(responses)
+try:
+    f.fetch_rows("key", "T", "MM")
+except ValueError:
+    pass
+else:
+    raise AssertionError("partial pages accepted")

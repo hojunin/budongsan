@@ -12,7 +12,17 @@ const articles = await FileAttachment("data/articles.json").json();
 const rone = await FileAttachment("data/rone.parquet").parquet();
 ```
 
-# 오늘의 브리핑
+# 부동산, 무엇을 확인할까요?
+
+<p class="lead">시장 관측과 나의 자금 가정을 구분해 살펴보세요.</p>
+<div class="question-grid">
+  <a class="card" href="./personal"><strong>지금 사도 될까?</strong><br>내 현금과 월 부담을 가정으로 계산</a>
+  <a class="card" href="./market"><strong>가격은 더 오를까?</strong><br>판단 유보 · 가격 흐름과 반대 근거 확인</a>
+  <a class="card" href="./buyers"><strong>사람들은 어떻게 느낄까?</strong><br>확인된 시장 지표와 거래 살펴보기</a>
+  <a class="card" href="./policy"><strong>정책은 어떻게 받아들일까?</strong><br>공식 원문과 의견 자료 확인 상태</a>
+</div>
+
+## 오늘의 시장 관측
 
 <p class="lead">국토교통부 실거래가, 한국부동산원, KB 지표와 최근 기사를 모아 기사·리포트에 바로 쓸 수 있는 문장으로 정리합니다. 문장 옆 <b>복사</b>를 누르면 출처와 기준일까지 함께 복사됩니다.</p>
 

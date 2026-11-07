@@ -32,6 +32,11 @@ def slugify(title: str) -> str:
 
 
 def main() -> int:
+    print("고정 스냅샷 발행이 구현될 때까지 초안 생성은 중단합니다.", file=sys.stderr)
+    return 1
+
+
+def legacy_main() -> int:
     title = " ".join(sys.argv[1:]).strip() or "주간 부동산 시장 브리핑"
     today = dt.date.today().isoformat()
     path = ROOT / "content" / "drafts" / f"{today}-{slugify(title)}.md"

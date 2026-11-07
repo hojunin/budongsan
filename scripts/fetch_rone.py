@@ -51,16 +51,20 @@ def fetch_rows(key: str, statbl: str, cycle: str, **filters) -> list[dict]:
             try:
                 r = requests.get(URL, params={"KEY": key, "Type": "json", "pIndex": page, "pSize": PAGE,
                                               "STATBL_ID": statbl, "DTACYCLE_CD": cycle, **filters}, timeout=60)
+                r.raise_for_status()
                 body = r.json()["SttsApiTblData"]
                 break
             except Exception as e:
                 if attempt == 2:
                     raise RuntimeError(redact(str(e))) from None
                 time.sleep(3 * (attempt + 1))
-        total = body[0]["head"][0]["list_total_count"]
-        chunk = body[1]["row"]
-        if not chunk:
-            break
+        count = int(body[0]["head"][0]["list_total_count"])
+        if count < 0 or (total is not None and count != total):
+            raise ValueError("R-ONE 전체 건수 변경")
+        total = count
+        chunk = body[1]["row"] if total else []
+        if not isinstance(chunk, list) or (not chunk and len(rows) < total) or len(rows) + len(chunk) > total:
+            raise ValueError("R-ONE 페이지 불완전")
         rows += chunk
         page += 1
     return rows
@@ -71,6 +75,8 @@ def fetch_table(key: str, statbl: str, cycle: str, start: str, by_group: bool = 
         recent = time.strftime("%Y%m", time.localtime(time.time() - 120 * 86400))  # 최근 몇 달로 지역 목록만 얻는다
         groups = {r["GRP_ID"] for r in fetch_rows(key, statbl, cycle, START_WRTTIME=recent)
                   if r.get("GRP_FULLNM") and r["GRP_FULLNM"].split(">")[0] in KEEP}
+        if not groups:
+            raise ValueError("R-ONE 지역 목록 없음")
         rows = [r for g in sorted(groups) for r in fetch_rows(key, statbl, cycle, START_WRTTIME=start, GRP_ID=g)]
     else:
         rows = fetch_rows(key, statbl, cycle, START_WRTTIME=start)
@@ -117,10 +123,17 @@ def main() -> int:
                 continue
             df.insert(0, "cycle", cycle)
             df.insert(0, "metric", metric)
+            if df.empty:
+                print(f"[rone] {metric}: 검증할 행이 없어 기존 자료를 유지합니다.", file=sys.stderr)
+                continue
             con.begin()
-            con.execute("DELETE FROM rone WHERE metric = ? AND period >= ?", [metric, start])
-            con.execute("INSERT INTO rone BY NAME SELECT * FROM df")
-            con.commit()
+            try:
+                con.execute("DELETE FROM rone WHERE metric = ? AND period >= ?", [metric, start])
+                con.execute("INSERT INTO rone BY NAME SELECT * FROM df")
+                con.commit()
+            except Exception:
+                con.rollback()
+                raise
             print(f"[rone] {metric}: {len(df)}행, {df['period'].min()}~{df['period'].max()} ({time.time() - t:.0f}초)")
     return 0
 

@@ -15,8 +15,8 @@ html { font-size: 16px; }
   --theme-foreground: #1d1f23;
   --theme-foreground-muted: #4b4f57;
   --theme-foreground-faint: #8a8f98;
-  --theme-foreground-focus: #c8553d;
-  --accent: #c8553d;
+  --theme-foreground-focus: #087f80;
+  --accent: #087f80;
   --accent-2: #2a6f97;
   --good: #2f7d4f;
   --warn: #b25e09;
@@ -39,7 +39,7 @@ html { font-size: 16px; }
     --theme-foreground: #eceef1;
     --theme-foreground-muted: #b9bec7;
     --theme-foreground-faint: #7d838d;
-    --accent: #e27a62;
+    --accent: #64d4c9;
     --accent-2: #6fb3d9;
     --good: #6cc38f;
     --warn: #f0a24d;
@@ -72,7 +72,7 @@ p, li { max-width: 68ch; line-height: 1.65; color: var(--theme-foreground-muted)
 .kpi-title { font-size: .8rem; color: var(--theme-foreground-faint); font-weight: 600; }
 .kpi-value { font-size: clamp(1.35rem, 3.6vw, 1.85rem); font-weight: 750; letter-spacing: -0.02em; margin-top: 4px; }
 .kpi-sub { font-size: .8rem; color: var(--theme-foreground-muted); margin-top: 2px; }
-.kpi.up .kpi-sub { color: var(--accent); }
+.kpi.up .kpi-sub { color: #c23531; }
 .kpi.down .kpi-sub { color: var(--accent-2); }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); margin: var(--gap) 0; }
 .grid-1 { margin: var(--gap) 0; }
@@ -372,3 +372,11 @@ observablehq-loading { display: none !important; }
 .article-meta { font-size: .75rem; color: var(--theme-foreground-faint); }
 .keyword-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .as-of { font-size: .8rem; color: var(--theme-foreground-faint); margin: -12px 0 20px; }
+
+.question-grid, .personal-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 1rem 0; }
+.question-grid a { color: var(--theme-foreground); text-decoration: none; min-height: 100px; }
+.question-grid a:hover, .question-grid a:focus-visible { outline: 2px solid var(--accent); }
+.personal-form label { display: grid; gap: 4px; }
+.personal-form input { font-size: 16px; min-height: 44px; }
+.personal-form button { min-height: 44px; }
+@media (max-width: 600px) { .question-grid, .personal-form { grid-template-columns: 1fr; } }

@@ -27,6 +27,8 @@ from pathlib import Path
 
 import duckdb
 import pandas as pd
+import requests
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "apt.duckdb"
@@ -39,6 +41,47 @@ REFRESH_MONTHS = int(os.environ.get("REFRESH_MONTHS", "3"))
 DAILY_BUDGET = int(os.environ.get("MOLIT_DAILY_BUDGET", "9000"))
 TABLE = {"trade": "molit_trade", "rent": "molit_rent"}
 TRADE_TYPE = {"trade": "매매", "rent": "전월세"}
+
+
+class VerifiedAPI:
+    """실패 또는 미완결 페이지를 빈 달로 저장하지 않는다."""
+    URLS = {
+        "매매": "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev",
+        "전월세": "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent",
+    }
+
+    def __init__(self, key):
+        self.key = requests.utils.unquote(key)
+
+    def get_data(self, _property, kind, code, year_month, translate=False):
+        rows, page, total = [], 1, None
+        while total is None or len(rows) < total:
+            response = requests.get(self.URLS[kind], params={"serviceKey": self.key, "LAWD_CD": code,
+                "DEAL_YMD": year_month, "numOfRows": 1000, "pageNo": page}, timeout=60)
+            response.raise_for_status()
+            root = ET.fromstring(response.content)
+            if root.findtext("./header/resultCode") != "000":
+                raise ValueError("MOLIT 오류 응답")
+            body = root.find("body")
+            count = int(body.findtext("totalCount"))
+            if count < 0 or (total is not None and count != total):
+                raise ValueError("MOLIT 전체 건수 변경")
+            total = count
+            if int(body.findtext("pageNo")) != page:
+                raise ValueError("MOLIT 페이지 번호 불일치")
+            items = body.findall("./items/item")
+            if not items and len(rows) < total:
+                raise ValueError("MOLIT 페이지 누락")
+            for item in items:
+                row = {child.tag: child.text for child in item}
+                required = {"sggCd", "dealYear", "dealMonth", "dealDay", "excluUseAr", "dealAmount" if kind == "매매" else "deposit"}
+                if not required.issubset(row) or row["sggCd"] != code or row["dealYear"] != year_month[:4] or str(row["dealMonth"]).zfill(2) != year_month[4:]:
+                    raise ValueError("MOLIT 행 형식 또는 조회 범위 불일치")
+                rows.append(row)
+            if len(rows) > total:
+                raise ValueError("MOLIT 전체 건수 초과")
+            page += 1
+        return pd.DataFrame(rows)
 
 
 def month_list(start: str, today: dt.date | None = None) -> list[str]:
@@ -59,7 +102,8 @@ def init(con: duckdb.DuckDBPyConnection) -> None:
 def save(con: duckdb.DuckDBPyConnection, kind: str, sgg: str, ym: str, df: pd.DataFrame | None) -> int:
     """한 시군구·한 달 분을 통째로 교체한다(같은 달을 다시 받아도 중복되지 않음)."""
     table = TABLE[kind]
-    df = pd.DataFrame() if df is None else df
+    if df is None:
+        raise ValueError("검증되지 않은 빈 응답")
     # 응답 컬럼 타입이 달마다 흔들리지 않도록 원본은 문자열로 둔다. 숫자 변환은 데이터 로더가 한다.
     df = df.assign(_sgg=sgg, _ym=ym).astype("string")
     con.begin()
@@ -87,7 +131,10 @@ def save(con: duckdb.DuckDBPyConnection, kind: str, sgg: str, ym: str, df: pd.Da
 def call(api, kind: str, sgg: str, ym: str, tries: int = 3, backoff: float = 3.0) -> pd.DataFrame | None:
     for i in range(tries):
         try:
-            return api.get_data("아파트", TRADE_TYPE[kind], sgg, year_month=ym, translate=False)
+            result = api.get_data("아파트", TRADE_TYPE[kind], sgg, year_month=ym, translate=False)
+            if not isinstance(result, pd.DataFrame):
+                raise ValueError("검증되지 않은 응답")
+            return result
         except Exception:  # 연결 리셋 등 일시 오류는 잠시 쉬고 다시 부른다
             if i == tries - 1:
                 raise
@@ -134,14 +181,12 @@ def main() -> int:
         print("[molit] MOLIT_SERVICE_KEY 가 없어 수집을 건너뜁니다 (샘플 데이터로 빌드됩니다).")
         return 0
 
-    from PublicDataReader import TransactionPrice  # 지연 import
-
     regions = json.loads(REGIONS.read_text(encoding="utf-8"))
     watch = json.loads(WATCHLIST.read_text(encoding="utf-8")) if WATCHLIST.exists() else []
     jobs = {"trade": [r["code"] for r in regions], "rent": sorted({w["sgg"] for w in watch})}
     DB.parent.mkdir(parents=True, exist_ok=True)
     with duckdb.connect(str(DB)) as con:
-        collect(TransactionPrice(key), con, jobs, month_list(START_YM))
+        collect(VerifiedAPI(key), con, jobs, month_list(START_YM))
     return 0
 
 

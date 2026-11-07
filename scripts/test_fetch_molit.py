@@ -21,7 +21,7 @@ class FakeAPI:
             self.flaky.discard((code, year_month))
             raise ConnectionResetError(104, "Connection reset by peer")
         if year_month == "202408":
-            return None  # 거래 0건인 달
+            return pd.DataFrame()  # 검증된 거래 0건인 달
         n = 2 if kind == "매매" else 1
         return pd.DataFrame({"sggCd": [code] * n, "dealAmount": ["90,000"] * n, "dealYear": [year_month[:4]] * n,
                              "aptSeq": [f"{code}-{i}" for i in range(n)]})
@@ -77,3 +77,28 @@ with contextlib.redirect_stderr(err):
     collect(LeakyAPI(), duckdb.connect(), {"trade": ["11110"]}, months[:1], pause=0, backoff=0)
 assert "SECRET" not in err.getvalue() and "serviceKey=***" in err.getvalue(), err.getvalue()
 print("ok")
+
+# 실패 응답은 기존 달을 지우거나 완료로 기록하지 않는다.
+class NoneAPI:
+    def get_data(self, *args, **kwargs):
+        return None
+before = con.execute("SELECT count(*) FROM molit_trade WHERE _sgg='11110' AND _ym='202410'").fetchone()[0]
+s = collect(NoneAPI(), con, {"trade": ["11110"]}, ["202410"], pause=0, backoff=0)
+assert s['trade']['failed'] == 1
+assert con.execute("SELECT count(*) FROM molit_trade WHERE _sgg='11110' AND _ym='202410'").fetchone()[0] == before
+
+from fetch_molit import VerifiedAPI
+from unittest.mock import patch
+class XMLResponse:
+    def __init__(self, content): self.content = content.encode()
+    def raise_for_status(self): pass
+
+def xml(total, page, items):
+    return f'<response><header><resultCode>000</resultCode></header><body><totalCount>{total}</totalCount><pageNo>{page}</pageNo><items>{items}</items></body></response>'
+row = '<item><sggCd>11110</sggCd><dealYear>2024</dealYear><dealMonth>10</dealMonth><dealDay>1</dealDay><excluUseAr>84</excluUseAr><dealAmount>100</dealAmount></item>'
+with patch('fetch_molit.requests.get', side_effect=[XMLResponse(xml(2,1,row)), XMLResponse(xml(2,2,''))]):
+    try: VerifiedAPI('key').get_data('아파트','매매','11110','202410')
+    except ValueError: pass
+    else: raise AssertionError('partial pages accepted')
+with patch('fetch_molit.requests.get', return_value=XMLResponse(xml(0,1,''))):
+    assert VerifiedAPI('key').get_data('아파트','매매','11110','202410').empty
