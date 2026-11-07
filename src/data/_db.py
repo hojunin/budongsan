@@ -5,7 +5,8 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-DB = Path(__file__).resolve().parents[2] / "data" / "apt.duckdb"
+# 배치가 쓰는 중에는 같은 파일을 열 수 없어서, 복사본으로 미리 볼 때 APT_DB 로 경로를 바꾼다.
+DB = Path(os.environ.get("APT_DB") or Path(__file__).resolve().parents[2] / "data" / "apt.duckdb")
 SITE_MONTHS = int(os.environ.get("SITE_MONTHS", "36"))  # 화면에 보낼 기간. 길수록 Parquet 이 커진다(25 MiB 제한)
 
 
