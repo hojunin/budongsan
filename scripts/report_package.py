@@ -188,7 +188,7 @@ def create_package(path, template, title, summary, evidence, scenario=None):
             return f"보증금 {fmt(q['deposit'])}만원 · 실제 월세 {fmt(q['monthly'])}만원 · 가정 연 {fmt(q['annual_rate'])}%"
         if template == 'buyer' and q.get('budget') is not None:
             return f"집값 상한 {fmt(q['budget'])}만원 · 세로선"
-        return '' 
+        return ''
     details = [line for e in evidence for line in textwrap.wrap(f'{e["scope"]} · {e["period"]} · n={e["sample_n"] if e["sample_n"] is not None else '미공표'} · {e["unit"]} · {e["source_id"]} · {e["source_url"]} · {condition(e)}', width=23)]
     plot_height = 65 + (len(evidence) * 105 if ranges else len(rows) * 86)
     height = plot_height + 20 * len(details) + 10
