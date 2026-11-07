@@ -1,0 +1,916 @@
+{
+  "conditions": {
+    "viewport": "390x844",
+    "dpr": 3,
+    "cpuSlowdown": 4,
+    "network": "9 Mbps / 50ms latency",
+    "baseURL": "http://127.0.0.1:8766",
+    "browserCache": "disabled",
+    "interactions": "programmatic, no recent-input exclusion benefit"
+  },
+  "results": [
+    {
+      "run": 1,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 1006.5,
+            "value": 0.0004356373850369661,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/market",
+      "initial": {
+        "cls": 0.0017295209002493206,
+        "errors": [],
+        "entries": [
+          {
+            "time": 14960.09999999404,
+            "value": 0.0017295209002493206,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0017295209002493206
+    },
+    {
+      "run": 1,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/outlook",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 1024.5999999940395,
+            "value": 0.0003443663766925893,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/market",
+      "initial": {
+        "cls": 0.0017295209002493206,
+        "errors": [],
+        "entries": [
+          {
+            "time": 15200.799999982119,
+            "value": 0.0017295209002493206,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0017295209002493206
+    },
+    {
+      "run": 2,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/outlook",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 1025.0999999940395,
+            "value": 0.0004356373850369661,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/regions",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/complexes",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "empty table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "reset table search",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/market",
+      "initial": {
+        "cls": 0.0017295209002493206,
+        "errors": [],
+        "entries": [
+          {
+            "time": 15071.799999982119,
+            "value": 0.0017295209002493206,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "remove chip",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0017295209002493206,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0017295209002493206
+    },
+    {
+      "run": 3,
+      "page": "/budget",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change interest",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/about",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/outlook",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/trades",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/longterm",
+      "initial": {
+        "cls": 2.3040840997535592e-05,
+        "errors": [],
+        "entries": [
+          {
+            "time": 8121.0999999940395,
+            "value": 2.3040840997535592e-05,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 2.3040840997535592e-05,
+          "entries": []
+        }
+      ],
+      "totalCLS": 2.3040840997535592e-05
+    },
+    {
+      "run": 1,
+      "page": "/buyers",
+      "initial": {
+        "cls": 0.0035825790076593066,
+        "errors": [],
+        "entries": [
+          {
+            "time": 14768.899999976158,
+            "value": 0.0035825790076593066,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0035825790076593066,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0035825790076593066
+    },
+    {
+      "run": 1,
+      "page": "/news",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/policy",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/trades",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/longterm",
+      "initial": {
+        "cls": 2.3040840997535592e-05,
+        "errors": [],
+        "entries": [
+          {
+            "time": 8133.100000023842,
+            "value": 2.3040840997535592e-05,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 2.3040840997535592e-05,
+          "entries": []
+        }
+      ],
+      "totalCLS": 2.3040840997535592e-05
+    },
+    {
+      "run": 2,
+      "page": "/buyers",
+      "initial": {
+        "cls": 0.0035825790076593066,
+        "errors": [],
+        "entries": [
+          {
+            "time": 14719.600000023842,
+            "value": 0.0035825790076593066,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0035825790076593066,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0035825790076593066
+    },
+    {
+      "run": 2,
+      "page": "/news",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/policy",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/trades",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/longterm",
+      "initial": {
+        "cls": 2.3040840997535592e-05,
+        "errors": [],
+        "entries": [
+          {
+            "time": 8109.799999982119,
+            "value": 2.3040840997535592e-05,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 2.3040840997535592e-05,
+          "entries": []
+        }
+      ],
+      "totalCLS": 2.3040840997535592e-05
+    },
+    {
+      "run": 3,
+      "page": "/buyers",
+      "initial": {
+        "cls": 0.0035825790076593066,
+        "errors": [],
+        "entries": [
+          {
+            "time": 14752.5,
+            "value": 0.0035825790076593066,
+            "recent": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0.0035825790076593066,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0.0035825790076593066
+    },
+    {
+      "run": 3,
+      "page": "/news",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/policy",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/personal",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 521,
+            "value": 0.0019407004127697733,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "edit input",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/personal",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 459.09999999403954,
+            "value": 0.0019407004127697733,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "edit input",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/personal",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": [
+          {
+            "time": 536.3000000119209,
+            "value": 0.0019407004127697733,
+            "recent": true
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "edit input",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/compare",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [
+        {
+          "name": "change band",
+          "cls": 0,
+          "entries": []
+        },
+        {
+          "name": "chart zoom and legend",
+          "cls": 0,
+          "entries": []
+        }
+      ],
+      "totalCLS": 0
+    },
+    {
+      "run": 1,
+      "page": "/reports/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 2,
+      "page": "/reports/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    },
+    {
+      "run": 3,
+      "page": "/reports/",
+      "initial": {
+        "cls": 0,
+        "errors": [],
+        "entries": []
+      },
+      "actions": [],
+      "totalCLS": 0
+    }
+  ]
+}
