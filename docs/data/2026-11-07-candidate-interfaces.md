@@ -92,3 +92,39 @@
 [공식 월간 조회](https://jumin.mois.go.kr/statMonth.do)에서 행정동별 주민등록 인구·세대 현황과 ‘행정기관코드 / 행정기관 / 총 인구수 / 세대수 / 세대당 인구 / 남자·여자 인구’라는 **화면 라벨**을 확인했다. 이는 CSV의 확정 헤더나 API 응답 필드명이 아니다. 단위는 인구 명, 주민등록 세대수 세대이며 통계 가구/주택수와 구분한다. 기준은 매월 말일, 안내상 다음달1일12시 이후 공표(주말·공휴일은 다음 평일). 이번 설계에서 실제 파일/인증 응답을 받지 않았다.
 
 운영 전 확정할 계약: 공식 다운로드 URL/HTTP method/필터 파라미터/인증·자동접근 조건, 실제 CSV/XLSX 헤더·인코딩·계층합계 행, 기간/지역 분할·최대조회범위·호출한도·라이선스, 행정기관코드 유효기간과 개편 이력. **모두 NOT VERIFIED**로 남긴다. 지역 합계와 하위동을 중복 합산하지 않으며 주민등록 세대를 KOSIS 일반가구로 치환하지 않는다. 제안 내부 키는 `(source,행정기관코드,기준월,인구구분)`이지만 원본 필드/행 단위 검증 뒤 확정한다. I18은 이 계약과 KOSIS 이동 계약이 모두 통과하기 전 운영 차단이다.
+
+## 7. 심리·전망·정책 반응 확장 소스
+
+2026-11-07 [가치 확장 설계 I21–I28](../superpowers/specs/2026-11-07-buyer-decisions-sentiment-policy-design.md)에 대응. 다음은 개념 설명과 전송 계약을 구분한 추가 후보다.
+
+| 소스 | 공식 확인한 것 | 전송/단위/범위의 미확정 및 사용 제한 |
+|---|---|---|
+| KB 시장심리·가격전망 | [공식 설명](https://data.kbland.kr/kbstats/psychology-of-housing-market)은 표본 중개업소의 매수자/매도자/비슷함 응답과 매수우위지수 산식을 명시, 월간 가격전망 메뉴 존재 | 현재 어댑터는 매수우위/거래활발 일부만. 가격전망 신규 endpoint/인자/문항/전망기간/응답/권리는 NOT VERIFIED. 기존 endpoint의 메뉴코드를 추측해 추가하지 않음. 이름에 ‘매수우위’가 있어도 값 상승=매수자 협상유리라고 명명 금지 |
+| 한국은행 주택가격전망CSI | [공식 스냅샷](https://snapshot.bok.or.kr/dashboard/C)은 현재 대비1년후 전망임을 설명 | 기존 ECOS 후보와 동일하게 API전송·표/항목코드·범위/모집단·수정·권리 미확정. 전국 지표를 단지/시군구 응답으로 표시하지 않음 |
+| 국토연구원 매매·전세 소비심리 | [공식 안내](https://kremap.krihs.re.kr/menu6/ReportView?bID=8971&kind=54&pID=930)는 월간 공표와 KOSIS 경로를 제시 | 현행 API/표/항목코드·실제 파일스키마·응답집단·지역/주택유형·문항·정정·권리 NOT VERIFIED. 오래된 보고서 구간/조사범위를 현행 계약으로 승격하지 않음. 매매·전세 시장부문을 매수자·임차인 별도표본으로 오인 금지 |
+
+심리 원천 내부 메타데이터 제안: `surveyId, providerId, releaseId, fieldworkFrom/To, publishedAt, respondentPopulation, geography, housingType, questionText, referencePeriod, expectationHorizon, indexFormulaVersion, neutralDefinition, weightInfo, sampleN|null, coverage, rightsRef`. 공급자 지수를 임의로 평균하지 않고 index point 변화는 p로 표기한다. 지수수치와 응답비중(%), 비중변화(%p)를 구분한다. 공식 원수치만 있을 때 찬성자/상승예상자 비중을 역산하지 않는다.
+
+### 7A. 네이버 데이터랩 검색어 트렌드 — 공식 전송 계약 확인
+
+[공식 명세](https://developers.naver.com/docs/serviceapi/datalab/search/search.md), 조회일2026-11-07. 인증/실응답 호출은 하지 않았다.
+
+- `POST https://openapi.naver.com/v1/datalab/search`, JSON body. 인증 headers `X-Naver-Client-Id`, `X-Naver-Client-Secret`. 제안 환경변수명 NAVER_CLIENT_ID/NAVER_CLIENT_SECRET은 내부 선택이며 현재 설정/구현된 값이 아니다.
+- 필수 `startDate`, `endDate`(yyyy-mm-dd), `timeUnit`(date/week/month), `keywordGroups[] {groupName, keywords[]}`. 문서상 최대5그룹, 그룹당 최대20검색어. 선택 device/ages/gender는 명세상 허용값을 검증한 뒤 사용한다.
+- 응답 `startDate,endDate,timeUnit,results[] {title,keywords,data[] {period,ratio}}`. ratio는 **조회결과에서 최대값100에 대한 상대값**, 검색건수·시장참여자수·찬반비율이 아니다. 문서 표의 ratio 타입은 string이나 JSON예시는 number이므로 양쪽을 검증 후 수치로 정규화하고 원형을 보존한다. 지역별 검색량 필드가 이 요청에 있다고 가정하지 않는다.
+- 요청 기간·검색어묶음·기기/연령/성별과 결과 전체의 normalization context hash를 저장한다. 다른 조회결과의 ratio를 절대수준처럼 결합하지 않는다. 이 응답은 page/cursor 방식이 아니며 기간·키워드 분할은 정규화 기준도 달라짐을 보존한다.
+- 일일/초당 허용량과 보관/재배포 세부조건은 앱 승인·현행 약관으로 확인 전 NOT VERIFIED. 오류 응답/빈 결과를 검색0으로 치환하지 않는다.
+- 활용: ‘주제 관심 추이’ 보조 패널만. 검색 증가=매수의향/불안/정책 찬반으로 출력하지 않는다.
+
+### 7B. 정책·외부 의견·사이트 응답 — 제안 내부 인터페이스
+
+아래는 외부 API가 아니라 제품이 새로 관리해야 할 계약이다. 아직 수집 UI/endpoint는 없다.
+
+- `PolicyVersion`: `policyId,version,officialSources[],announcedAt,effectiveFrom,verifiedAt,scope,conditions,exceptions,expiresAt|null,legalBasisRefs[],status`. 발표/시행/예고/개정/철회를 구분. 원문에 없는 시행일·대상은 null/미확정.
+- `ExternalSurvey`: `surveyId,policyVersion,fieldworkPeriod,questionVersion,questionText,population,samplingMethod,sponsor,weights,sampleN,responseOptions,results,rightsRef`. 질문/표본/기간이 다른 조사 결과를 단순 합산 금지.
+- `VisitorResponse`: `policyVersion,questionVersion,period,responseId,consentVersion,roles[],answers,createdAt`. 역할 복수선택, 문항별 분모·무응답·모름 별도. 개인정보 최소화·보관/삭제·중복응답·공개 셀n 기준을 확정 전 수집 시작 금지. 가명 responseId도 보관 정책 대상으로 다룬다.
+- `EditorialPosition`: `policyVersion,sourceUrl,speakerRole,publishedAt,evidenceSpanRef,topicAxis,position,reviewStatus,rightsRef`. 이용권·인용범위·편집 검토 없이 기사 전문/댓글을 저장하거나 AI의 입장분류를 자동 공개하지 않는다. 찬반·예상 가격영향·집행 가능성은 별개 축이다.
+
+사이트 응답의 복수선택 비율은 항목별 선택한 유효응답/문항 유효응답이며 합계100% 초과 가능. 고유 사람수를 검증하지 못하면 응답 레코드 수로 표시한다. 무응답/모름/우려없음과 역할 중복을 분리한다.
+
+정책 전후 그래픽은 이 계약과 기존 실제 지표를 날짜로 병렬 표시하는 것부터 시작한다. 현재 API/크롤링만으로 이용자의 대출 적격성·정책 인과효과·대표성 있는 여론까지 얻은 것으로 간주하지 않는다.
