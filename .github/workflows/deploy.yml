@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["src/**", "observablehq.config.js", "package.json"]
+    paths: ["src/**", "observablehq.config.js", "package.json", ".github/workflows/deploy.yml"]
 
 concurrency:
   group: deploy
