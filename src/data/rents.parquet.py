@@ -1,4 +1,4 @@
-"""데이터 로더: 국토부 전월세 캐시(관심 단지 시군구) → 전세 중심 Parquet (stdout). 없으면 가짜 샘플."""
+"""데이터 로더: 국토부 전월세(data/apt.duckdb, 관심 단지 시군구) → 전세 중심 Parquet (stdout). 없으면 가짜 샘플."""
 import json
 import sys
 from pathlib import Path
@@ -6,15 +6,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from _db import recent
+
 ROOT = Path(__file__).resolve().parents[2]
-CACHE = ROOT / "data" / "cache" / "molit" / "rent"
 WATCH = json.loads((ROOT / "src" / "data" / "watchlist.json").read_text(encoding="utf-8"))
 
-files = [f for f in CACHE.glob("*/*.parquet")]
-frames = [x for x in (pd.read_parquet(f) for f in files) if len(x)]
-
-if frames:
-    raw = pd.concat(frames, ignore_index=True)
+raw = recent("molit_rent")
+if len(raw):
     df = pd.DataFrame({
         "sgg": raw["sggCd"].astype(str).str.zfill(5),
         "umd": raw["umdNm"].astype(str).str.strip(),

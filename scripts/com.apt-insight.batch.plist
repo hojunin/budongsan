@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 매주 월요일 09:17 에 scripts/batch.sh 실행. Mac 이 잠자고 있었으면 깨어난 뒤 실행된다.
+     __ROOT__ 는 설치할 때 저장소 경로로 바꾼다 (README '주간 배치' 참고). -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.apt-insight.batch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>__ROOT__/scripts/batch.sh &gt;&gt; __ROOT__/data/batch.log 2&gt;&amp;1</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>1</integer>
+    <key>Hour</key>
+    <integer>9</integer>
+    <key>Minute</key>
+    <integer>17</integer>
+  </dict>
+</dict>
+</plist>

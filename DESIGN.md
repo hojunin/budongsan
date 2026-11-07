@@ -6,7 +6,7 @@
 
 | 원칙 | 구체적으로 |
 | --- | --- |
-| 가볍게 | 서버 없음. 빌드 때 데이터를 받아 Parquet으로 굽고, 브라우저의 DuckDB가 그 파일을 직접 질의한다. |
+| 가볍게 | 서빙 서버 없음. 로컬 배치가 원본을 DuckDB 파일에 쌓고, 빌드 때 Parquet으로 구워서, 브라우저의 DuckDB가 그 파일을 직접 질의한다. |
 | 커스텀 | 지역(서울 전체·경기 전체·경기 시 전체·시군구), 평형, 기간, 단지를 화면에서 고른다. 고를 때마다 브라우저에서 SQL이 다시 돈다. |
 | 가독성 | 화면마다 핵심 숫자 4개(KPI 카드) → 큰 차트 → 보조 차트 순서. 한 차트에는 한 가지 질문만 담는다. 숫자는 `억/만` 단위로 표기한다. |
 | 모던 UI | Pretendard 가변 폰트, 카드형 레이아웃, 라이트/다크 자동 전환, 차트 툴팁. |
@@ -27,18 +27,23 @@
 ## 3. 아키텍처
 
 ```
-GitHub Actions (매월 16일 + 매주 월요일 + 수동)
-  ├─ scripts/fetch_molit.py   국토부 매매(서울·경기 69개 시군구 × 36개월), 전월세(관심 단지 시군구)
-  │                            → data/cache/molit/… (actions/cache 로 실행 간 유지, 최근 3개월만 재수집)
-  ├─ scripts/fetch_kb.py      KB 매매·전세지수, 전세가율, 매수우위·거래활발지수 (서울·경기 월간)
-  ├─ observable build         src/data/*.parquet.py 로더가 캐시를 정제해 Parquet 생성
+로컬 Mac 배치 scripts/batch.sh (launchd, 매주 월요일 09:17)
+  ├─ scripts/fetch_molit.py   국토부 매매(서울·경기 69개 시군구), 전월세(관심 단지 시군구), 2006-01부터
+  │                            → data/apt.duckdb (molit_trade, molit_rent, fetch_log). 받은 달은 건너뛰고 최근 3개월만 교체
+  ├─ scripts/fetch_kb.py      KB 매매·전세지수, 전세가율, 매수우위·거래활발지수 → kb_* 테이블(매번 교체)
+  ├─ wrangler r2 object put   data/apt.duckdb → R2 apt-insight-backup/apt-YYYY-MM.duckdb
+  ├─ observable build         src/data/*.parquet.py 로더가 DB에서 최근 SITE_MONTHS(36)개월을 정제해 Parquet 생성
   └─ wrangler pages deploy    dist/ → Cloudflare Pages
+GitHub Actions (push·PR)
+  └─ 샘플 데이터로 빌드·크기 검사만 (배포하지 않음)
 브라우저
   └─ DuckDBClient.of({trades, rents}) → 입력값으로 SQL → Plot 차트
 ```
 
-- 실거래 API 호출량: 첫 실행 약 69 × 36 = 2,484건 + 전월세. 이후 실행은 약 69 × 3 = 207건. 개발계정 일일 1만 건 안이다. 한도에 닿으면 다음 실행이 이어 받는다(`MOLIT_DAILY_BUDGET`).
-- 서울·경기 전체 36개월이면 수십만 건이라 Parquet이 커진다. Cloudflare Pages는 파일 하나에 25 MiB까지만 올라가서, CI에서 크기를 검사한다. 넘으면 `trades` 를 시도별(`trades-11`, `trades-41`)로 나눈다.
+- 왜 로컬인가: 국토부 API가 해외 IP(GitHub 러너)의 연결을 자주 끊는다. 인증키도 로컬 `.env` 에만 둔다.
+- 왜 DuckDB 파일인가: 서빙은 정적이라 DB 서버가 필요 없고, 출처가 늘어도 테이블로 한곳에 모인다. 원격 질의가 필요해지면 같은 SQL로 Postgres 로 옮긴다.
+- 실거래 API 호출량: 과거 전체(2006년~)는 약 69 × 250 = 17,000건이라 API별 하루 9,000건(`MOLIT_DAILY_BUDGET`)으로 2~3일에 걸쳐 최신 달부터 채운다. 다 채운 뒤 매 실행은 약 69 × 3 + 7 × 3 = 228건.
+- DB에는 전 기간을 두고 화면에는 최근 36개월만 보낸다. Cloudflare Pages는 파일 하나에 25 MiB까지만 올라가서 배치와 CI가 크기를 검사한다. 넘으면 `SITE_MONTHS` 를 줄이거나 `trades` 를 시도별(`trades-11`, `trades-41`)로 나눈다.
 
 ## 4. 화면 구성
 
@@ -66,14 +71,15 @@ GitHub Actions (매월 16일 + 매주 월요일 + 수동)
 
 ## 6. 커스터마이즈
 
-- **관심 단지 추가**: `src/data/watchlist.json` 에 한 줄 추가 → push 하면 다시 배포. 전월세도 그 시군구부터 수집된다.
+- **관심 단지 추가**: `src/data/watchlist.json` 에 한 줄 추가 → 다음 배치부터 그 시군구 전월세도 수집된다.
 - **호가 기록**: `src/data/listings.csv` 에 날짜·단지 id·평형·호가를 적는다. 네이버 부동산은 자동 수집하지 않는다(법적 위험).
-- **기간**: `MONTHS`(기본 36) 환경변수.
+- **기간**: 수집 시작 `START_YM`(기본 200601), 화면에 보낼 기간 `SITE_MONTHS`(기본 36) 환경변수.
 - **지표 추가**: 각 페이지의 SQL에 집계 컬럼 하나를 더하고 Plot 마크를 하나 더한다.
 
 ## 7. 알려진 한계와 다음 단계
 
 - 최근 1개월 실거래는 신고 지연으로 적게 잡힌다 → 추세에서 제외.
-- KB는 공식 API가 아니어서 형식이 바뀌면 수집이 멈춘다 → 마지막 캐시 유지. 해외 IP(GitHub Actions)에서 막힐 수도 있다. 그러면 로컬에서 `npm run fetch` 후 캐시를 올리는 방식으로 바꾼다.
+- KB는 공식 API가 아니어서 형식이 바뀌면 수집이 멈춘다 → 마지막 `kb_*` 테이블 유지.
+- 배치는 Mac이 켜져 있어야 돈다(잠들어 있었으면 깨어난 뒤 실행). DB 파일이 약 300MB를 넘으면 R2 백업을 wrangler 대신 S3 API로 올려야 한다.
 - 행정구역 변경(예: 화성시 구 신설)은 `make_regions.py` 재실행이 필요하다.
 - 다음 단계 후보: ① Cloudflare Pages Functions 로 미리 굽지 않은 지역을 즉석 조회하는 프록시(인증키는 서버에만), ② 한국은행 ECOS 기준금리·주담대 금리 보조지표, ③ 관심 단지 신규 거래 알림.

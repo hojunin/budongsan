@@ -1,0 +1,30 @@
+# 빌드 확인만 한다(샘플 데이터). 실데이터 수집·배포는 로컬 배치(scripts/batch.sh)가 한다:
+# 국토부 API 가 해외 IP(GitHub 러너)의 연결을 자주 끊고, 여기서 배포하면 샘플로 사이트를 덮어쓰기 때문.
+name: build-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      OBSERVABLE_TELEMETRY_DISABLE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/test_fetch_molit.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Check file sizes (Cloudflare Pages 25 MiB/파일)
+        run: find dist -type f -size +24M -print -exec false {} +

@@ -1,6 +1,6 @@
-"""데이터 로더: 국토부 매매 실거래 캐시 → 브라우저용 정제 Parquet (stdout).
+"""데이터 로더: 국토부 매매 실거래(data/apt.duckdb) → 브라우저용 정제 Parquet (stdout).
 
-캐시가 비어 있으면(인증키 없이 로컬 빌드) 화면 개발용 **가짜 샘플**을 만들고 is_sample=True 로 표시한다.
+DB가 비어 있으면(인증키 없이 로컬 빌드) 화면 개발용 **가짜 샘플**을 만들고 is_sample=True 로 표시한다.
 """
 import json
 import sys
@@ -9,8 +9,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from _db import recent
+
 ROOT = Path(__file__).resolve().parents[2]
-CACHE = ROOT / "data" / "cache" / "molit" / "trade"
 REGIONS = json.loads((ROOT / "src" / "data" / "regions.json").read_text(encoding="utf-8"))
 WATCH = json.loads((ROOT / "src" / "data" / "watchlist.json").read_text(encoding="utf-8"))
 SGG_NAME = {r["code"]: r["name"] for r in REGIONS}
@@ -26,12 +27,9 @@ def band_of(a: float) -> str:
 
 
 def load_cache() -> pd.DataFrame:
-    files = list(CACHE.glob("*/*.parquet"))
-    frames = [pd.read_parquet(f) for f in files]
-    frames = [f for f in frames if len(f)]
-    if not frames:
+    raw = recent("molit_trade")
+    if raw.empty:
         return pd.DataFrame()
-    raw = pd.concat(frames, ignore_index=True)
     out = pd.DataFrame({
         "sgg": raw["sggCd"].astype(str).str.zfill(5),
         "umd": raw["umdNm"].astype(str).str.strip(),

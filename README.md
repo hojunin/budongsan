@@ -1,32 +1,43 @@
 # 첫 집 데이터
 
-국토부 실거래가·KB 지표로 지역과 관심 단지를 판단하는 정적 대시보드. Observable Framework로 만들고 Cloudflare Pages에 배포한다. 설계는 [DESIGN.md](DESIGN.md).
+국토부 실거래가·KB 지표로 지역과 관심 단지를 판단하는 정적 대시보드. 로컬 배치가 데이터를 DuckDB 파일(`data/apt.duckdb`)에 쌓고, Observable Framework로 빌드해 Cloudflare Pages에 올린다. 설계는 [DESIGN.md](DESIGN.md).
 
 ## 로컬 실행
 
+Python은 3.12를 쓴다. Homebrew 기본 3.15에서는 pandas 2.2.3(PublicDataReader가 고정)이 죽는다.
+
 ```bash
 npm install
-pip install -r requirements.txt
-npm run dev          # http://127.0.0.1:3000 — 인증키가 없으면 '샘플 데이터'로 뜬다
+uv venv -p 3.12 .venv && VIRTUAL_ENV=.venv uv pip install -r requirements.txt
+PATH="$PWD/.venv/bin:$PATH" npm run dev   # http://127.0.0.1:3000 — DB가 없으면 '샘플 데이터'로 뜬다
 ```
 
-실데이터로 보려면:
+## 데이터 수집과 배포 (로컬 배치)
+
+1. 공공데이터포털에서 **국토교통부_아파트 매매 실거래가 상세 자료**, **국토교통부_아파트 전월세 실거래가 자료** 활용신청(자동승인).
+2. 저장소 루트에 `.env` 를 만든다(Git에 올라가지 않는다).
+   ```bash
+   MOLIT_SERVICE_KEY=공공데이터포털 일반 인증키(Decoding)
+   # 선택: 무인 실행에서 wrangler 로그인이 만료될 때를 대비한 API 토큰(Account · Cloudflare Pages · Edit, R2 · Edit)
+   # CLOUDFLARE_API_TOKEN=...
+   # CLOUDFLARE_ACCOUNT_ID=...
+   ```
+3. `npx wrangler login` (Cloudflare Pages 프로젝트 `apt-insight`, R2 버킷 `apt-insight-backup` 은 만들어져 있다).
+4. 배치를 한 번 돌린다. 수집 → R2 백업 → 빌드 → 배포 순서다.
+   ```bash
+   scripts/batch.sh
+   ```
+   첫 수집은 2006년부터라 API별 하루 9,000건 한도에 걸린다. 최신 달부터 채우므로, 다 채울 때까지(2~3일) 하루 한 번씩 다시 돌린다.
+
+### 주간 배치 등록 (launchd, 매주 월요일 09:17)
 
 ```bash
-export MOLIT_SERVICE_KEY="공공데이터포털 일반 인증키(Decoding)"
-npm run fetch        # data/cache 에 실거래·KB 저장 (첫 실행은 수십 분)
-npm run clean && npm run dev
+sed "s#__ROOT__#$PWD#g" scripts/com.apt-insight.batch.plist > ~/Library/LaunchAgents/com.apt-insight.batch.plist && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.apt-insight.batch.plist
 ```
 
-## 배포 (Cloudflare Pages)
+로그는 `data/batch.log`. 해제: `launchctl bootout gui/$(id -u)/com.apt-insight.batch`.
 
-1. 공공데이터포털에서 **국토교통부_아파트 매매 실거래가 상세 자료**, **국토교통부_아파트 전월세 실거래가 자료** 활용 신청 → 인증키 발급.
-2. Cloudflare 대시보드 → Workers & Pages → Pages 프로젝트 `apt-insight` 생성(Direct Upload).
-3. Cloudflare API 토큰 발급(권한: Account · Cloudflare Pages · Edit).
-4. GitHub 저장소 Settings → Secrets 에 `MOLIT_SERVICE_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` 등록.
-5. Actions 탭에서 `build-and-deploy` 를 수동 실행. 이후에는 매월 16일·매주 월요일에 자동으로 갱신된다.
-
-빌드를 Cloudflare 쪽에서 하지 않는 이유: 데이터 수집에 파이썬과 수십 분이 필요하고, 인증키를 GitHub Secrets 에만 두기 위해서다.
+GitHub Actions(`build-check`)는 push·PR마다 샘플 데이터로 빌드만 확인하고 배포하지 않는다.
 
 ## 자주 바꾸는 파일
 

@@ -1,12 +1,10 @@
-"""데이터 로더: KB 캐시 → 긴 형식(metric, region_code, region, date, value) Parquet. 없으면 가짜 샘플."""
+"""데이터 로더: KB 지표(data/apt.duckdb 의 kb_* 테이블) → 긴 형식(metric, region_code, region, date, value) Parquet. 없으면 가짜 샘플."""
 import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-CACHE = ROOT / "data" / "cache" / "kb"
+from _db import query
 
 VALUE_COL = {
     "price_sale": "가격지수",
@@ -16,12 +14,13 @@ VALUE_COL = {
     "trade_activity": "매매거래지수",
 }
 
+tables = {m: d for m in VALUE_COL if (d := query(f"SELECT * FROM kb_{m}")) is not None}
+
 frames = []
 for metric, col in VALUE_COL.items():
-    f = CACHE / f"{metric}.parquet"
-    if not f.exists():
+    if metric not in tables:
         continue
-    d = pd.read_parquet(f)
+    d = tables[metric]
     if col is None or col not in d.columns:
         num = [c for c in d.columns if pd.api.types.is_numeric_dtype(d[c]) and c not in ("지역코드",)]
         if not num:
