@@ -6,7 +6,7 @@
   "scripts": {
     "fetch": "python3 scripts/fetch_molit.py && python3 scripts/fetch_kb.py",
     "dev": "observable preview",
-    "build": "observable build",
+    "build": "observable build && node scripts/duckdb_wasm_cdn.js",
     "clean": "rm -rf dist src/.observablehq/cache",
     "deploy": "wrangler pages deploy dist --project-name=apt-insight"
   },

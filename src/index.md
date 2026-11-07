@@ -6,7 +6,7 @@ title: 시장 한눈에
 import {regionOptions, bandWhere, sinceWhere, card, sampleBanner, plotBase, won, pct, signed, num, BANDS, BAND_LABEL, COLOR} from "./components/ui.js";
 const regions = await FileAttachment("data/regions.json").json();
 const db = await DuckDBClient.of({trades: FileAttachment("data/trades.parquet")});
-const meta = (await db.query(`SELECT bool_or(is_sample) AS sample, max(deal_date) AS last FROM trades`))[0];
+const meta = await db.queryRow(`SELECT bool_or(is_sample) AS sample, max(deal_date) AS last FROM trades`);
 ```
 
 # 시장 한눈에

@@ -47,4 +47,4 @@ df["band"] = pd.cut(df["area"], [0, 50, 67, 80, 90, 115, 1e9], right=False,
 df["jeonse"] = df["monthly"].eq(0)
 df["complex_key"] = df["sgg"] + "|" + df["umd"] + "|" + df["apt"]
 df["deal_date"] = df["deal_date"].dt.date
-df.to_parquet(sys.stdout.buffer, index=False, compression="zstd")
+sys.stdout.buffer.write(df.to_parquet(index=False, compression="zstd"))  # pandas 2.2.3 + pyarrow 26: to_parquet(stdout) writes 0 bytes

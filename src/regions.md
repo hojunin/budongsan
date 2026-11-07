@@ -6,7 +6,7 @@ title: 지역 비교
 import {regionOptions, bandWhere, sinceWhere, sampleBanner, plotBase, num, pct, signed, BANDS, BAND_LABEL, PALETTE} from "./components/ui.js";
 const regions = await FileAttachment("data/regions.json").json();
 const db = await DuckDBClient.of({trades: FileAttachment("data/trades.parquet")});
-const isSample = (await db.query(`SELECT bool_or(is_sample) AS s FROM trades`))[0].s;
+const isSample = (await db.queryRow(`SELECT bool_or(is_sample) AS s FROM trades`)).s;
 const OPTS = regionOptions(regions);
 const pick = (labels) => OPTS.filter((o) => labels.includes(o.label));
 ```

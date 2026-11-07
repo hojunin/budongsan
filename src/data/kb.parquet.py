@@ -57,4 +57,4 @@ else:
     df["is_sample"] = True
 
 df["date"] = pd.to_datetime(df["date"]).dt.date  # date32
-df.to_parquet(sys.stdout.buffer, index=False, compression="zstd")
+sys.stdout.buffer.write(df.to_parquet(index=False, compression="zstd"))  # pandas 2.2.3 + pyarrow 26: to_parquet(stdout) writes 0 bytes

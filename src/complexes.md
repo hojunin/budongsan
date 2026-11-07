@@ -8,7 +8,7 @@ const regions = await FileAttachment("data/regions.json").json();
 const watch = await FileAttachment("data/watchlist.json").json();
 const listings = (await FileAttachment("data/listings.csv").csv({typed: true})).filter((d) => d.min_ask || d.median_ask);
 const db = await DuckDBClient.of({trades: FileAttachment("data/trades.parquet"), rents: FileAttachment("data/rents.parquet")});
-const isSample = (await db.query(`SELECT bool_or(is_sample) AS s FROM trades`))[0].s;
+const isSample = (await db.queryRow(`SELECT bool_or(is_sample) AS s FROM trades`)).s;
 const esc = (s) => String(s).replace(/'/g, "''");
 const SEARCH_OPTS = regionOptions(regions).slice(2);
 ```

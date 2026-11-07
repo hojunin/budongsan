@@ -96,4 +96,4 @@ df.loc[prev_max.index, "new_high"] = (df.loc[prev_max.index, "price"] > prev_max
 cols = ["deal_date", "ym", "sido", "sgg", "sgg_name", "umd", "apt", "complex_key", "area", "band",
         "price", "ppm2", "floor", "build_year", "canceled", "direct", "buyer", "new_high", "is_sample"]
 df["deal_date"] = df["deal_date"].dt.date  # date32 → 브라우저에서 Date
-df[cols].to_parquet(sys.stdout.buffer, index=False, compression="zstd")
+sys.stdout.buffer.write(df[cols].to_parquet(index=False, compression="zstd"))  # pandas 2.2.3 + pyarrow 26: to_parquet(stdout) writes 0 bytes
