@@ -7,7 +7,7 @@
 
 환경변수
   MOLIT_SERVICE_KEY  공공데이터포털에서 받은 일반 인증키(Decoding 키 권장)
-  START_YM           수집 시작 월(기본 200601, 국토부 공개 시작 시점)
+  START_YM           수집 시작 월 YYYYMM (기본: 실행일 기준 10년 전 같은 달)
   REFRESH_MONTHS     다시 받을 최근 개월 수(기본 3)
   MOLIT_DAILY_BUDGET API별 하루 호출 상한(기본 9000, 개발계정 1만 건/일)
 
@@ -32,7 +32,8 @@ DB = ROOT / "data" / "apt.duckdb"
 REGIONS = ROOT / "src" / "data" / "regions.json"
 WATCHLIST = ROOT / "src" / "data" / "watchlist.json"
 
-START_YM = os.environ.get("START_YM", "200601")
+_today = dt.date.today()
+START_YM = os.environ.get("START_YM") or f"{_today.year - 10}{_today.month:02d}"  # 최근 10년: 매매 약 69 × 121 = 8,350건이라 하루 예산 안에 다 받는다
 REFRESH_MONTHS = int(os.environ.get("REFRESH_MONTHS", "3"))
 DAILY_BUDGET = int(os.environ.get("MOLIT_DAILY_BUDGET", "9000"))
 TABLE = {"trade": "molit_trade", "rent": "molit_rent"}

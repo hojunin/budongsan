@@ -28,7 +28,7 @@
 
 ```
 로컬 Mac 배치 scripts/batch.sh (launchd, 매주 월요일 09:17)
-  ├─ scripts/fetch_molit.py   국토부 매매(서울·경기 69개 시군구), 전월세(관심 단지 시군구), 2006-01부터
+  ├─ scripts/fetch_molit.py   국토부 매매(서울·경기 69개 시군구), 전월세(관심 단지 시군구), 최근 10년
   │                            → data/apt.duckdb (molit_trade, molit_rent, fetch_log). 받은 달은 건너뛰고 최근 3개월만 교체
   ├─ scripts/fetch_kb.py      KB 매매·전세지수, 전세가율, 매수우위·거래활발지수 → kb_* 테이블(매번 교체)
   ├─ wrangler r2 object put   data/apt.duckdb → R2 apt-insight-backup/apt-YYYY-MM.duckdb
@@ -42,7 +42,7 @@ GitHub Actions (push·PR)
 
 - 왜 로컬인가: 국토부 API가 해외 IP(GitHub 러너)의 연결을 자주 끊는다. 인증키도 로컬 `.env` 에만 둔다.
 - 왜 DuckDB 파일인가: 서빙은 정적이라 DB 서버가 필요 없고, 출처가 늘어도 테이블로 한곳에 모인다. 원격 질의가 필요해지면 같은 SQL로 Postgres 로 옮긴다.
-- 실거래 API 호출량: 과거 전체(2006년~)는 약 69 × 250 = 17,000건이라 API별 하루 9,000건(`MOLIT_DAILY_BUDGET`)으로 2~3일에 걸쳐 최신 달부터 채운다. 다 채운 뒤 매 실행은 약 69 × 3 + 7 × 3 = 228건.
+- 실거래 API 호출량: 최근 10년은 약 69 × 121 = 8,350건이라 API별 하루 9,000건(`MOLIT_DAILY_BUDGET`) 안에서 첫 실행에 다 받는다(약 45분). 이후 매 실행은 새 달과 최근 3개월만 받아 약 69 × 3 + 7 × 3 = 228건. 10년이 지난 달은 지우지 않고 그대로 둔다.
 - DB에는 전 기간을 두고 화면에는 최근 36개월만 보낸다. Cloudflare Pages는 파일 하나에 25 MiB까지만 올라가서 배치와 CI가 크기를 검사한다. 넘으면 `SITE_MONTHS` 를 줄이거나 `trades` 를 시도별(`trades-11`, `trades-41`)로 나눈다.
 
 ## 4. 화면 구성
@@ -73,7 +73,7 @@ GitHub Actions (push·PR)
 
 - **관심 단지 추가**: `src/data/watchlist.json` 에 한 줄 추가 → 다음 배치부터 그 시군구 전월세도 수집된다.
 - **호가 기록**: `src/data/listings.csv` 에 날짜·단지 id·평형·호가를 적는다. 네이버 부동산은 자동 수집하지 않는다(법적 위험).
-- **기간**: 수집 시작 `START_YM`(기본 200601), 화면에 보낼 기간 `SITE_MONTHS`(기본 36) 환경변수.
+- **기간**: 수집 시작 `START_YM`(기본 실행일 기준 10년 전), 화면에 보낼 기간 `SITE_MONTHS`(기본 36) 환경변수.
 - **지표 추가**: 각 페이지의 SQL에 집계 컬럼 하나를 더하고 Plot 마크를 하나 더한다.
 
 ## 7. 알려진 한계와 다음 단계
