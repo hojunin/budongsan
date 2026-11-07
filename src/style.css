@@ -125,7 +125,7 @@ table { font-size: .9rem; }
 /* Dashboard shell */
 #observablehq-main { padding-top: 36px; }
 #observablehq-main > h1 { margin-top: 0; line-height: 1.25; }
-#observablehq-main > h1::before { content: "첫 집 데이터 / INSIGHT"; display: block; margin-bottom: 14px; font-size: .68rem; font-weight: 700; letter-spacing: .13em; color: var(--accent); }
+#observablehq-main > h1::before { content: "부동산 인사이트 / DATA DESK"; display: block; margin-bottom: 14px; font-size: .68rem; font-weight: 700; letter-spacing: .13em; color: var(--accent); }
 .lead { margin-bottom: 28px; max-width: 76ch; font-size: .95rem; }
 #observablehq-sidebar { background: var(--theme-background-alt); border-right: 1px solid var(--color-lightGrey); }
 #observablehq-sidebar a { border-radius: 9px; transition: background-color .18s, color .18s; }
@@ -354,3 +354,21 @@ observablehq-loading { display: none !important; }
   .chart-heading { margin-bottom: 12px; }
   .chart-info summary { width: 32px; height: 32px; }
 }
+
+/* ---------- 브리핑: 인사이트 문장 · 기사 목록 ---------- */
+.insight-list, .article-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.insight { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--color-lightGrey); border-radius: 12px; background: var(--theme-background-alt); }
+.insight.up { border-left: 3px solid var(--accent); }
+.insight.down { border-left: 3px solid var(--accent-2); }
+.insight-body { flex: 1; min-width: 0; }
+.insight-title { margin: 6px 0 4px; font-weight: 650; line-height: 1.5; max-width: none; }
+.insight-meta, .insight-detail { margin: 0; font-size: .78rem; color: var(--theme-foreground-faint); line-height: 1.6; max-width: none; }
+.copy-btn { flex: none; min-height: 32px; padding: 0 12px; border: 1px solid var(--color-lightGrey); border-radius: 8px; background: transparent; color: var(--theme-foreground-muted); font: 600 .75rem var(--sans-serif); cursor: pointer; }
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.article-list li { display: grid; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--color-lightGrey); }
+.article-list li:last-child { border-bottom: 0; }
+.article-list a { color: var(--theme-foreground); text-decoration: none; font-weight: 550; line-height: 1.5; }
+.article-list a:hover { color: var(--accent); text-decoration: underline; }
+.article-meta { font-size: .75rem; color: var(--theme-foreground-faint); }
+.keyword-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.as-of { font-size: .8rem; color: var(--theme-foreground-faint); margin: -12px 0 20px; }

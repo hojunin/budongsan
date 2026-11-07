@@ -20,6 +20,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python scripts/test_fetch_molit.py
+      - run: python scripts/test_fetch_rone.py
       - uses: actions/setup-node@v4
         with:
           node-version: 22

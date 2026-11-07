@@ -63,3 +63,43 @@ export function sampleTag(isSample) {
     ? html`<span class="mock-data-tag" role="status" aria-label="목데이터: 실제 판단에 사용하지 마세요" title="실제 판단에 사용하지 마세요">목데이터</span>`
     : "";
 }
+
+// ---------- 제목 + 설명 팝오버 (appearance.js 가 열고 닫는다) ----------
+const INFO_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6m0-10h.01"></path></svg>';
+export function heading(title, info, level = 2) {
+  const h = document.createElement(`h${level}`);
+  h.textContent = title;
+  const node = html`<div class="chart-heading">${h}${info ? html`<details class="chart-info"><summary aria-label=${`${title} 설명`}></summary><div class="chart-info-panel">${info}</div></details>` : ""}</div>`;
+  if (info) node.querySelector("summary").innerHTML = INFO_ICON;
+  return node;
+}
+
+// ---------- 기사·리포트 링크 목록 ----------
+export function articleList(rows, {empty = "표시할 기사가 없습니다"} = {}) {
+  if (!rows.length) return html`<p class="note">${empty}</p>`;
+  return html`<ul class="article-list">${rows.map((a) => html`<li>
+    <a href=${a.url} target="_blank" rel="noopener noreferrer">${a.title}</a>
+    <span class="article-meta">${a.source} · ${a.published?.slice(0, 16) ?? ""}${a.category === "report" ? html` · <span class="chip">리포트·동향</span>` : ""}</span>
+  </li>`)}</ul>`;
+}
+
+// ---------- 인사이트 문장 (복사 버튼 포함) ----------
+export function insightList(items) {
+  if (!items.length) return html`<p class="note">아직 계산할 데이터가 없습니다. 배치(scripts/batch.sh)를 돌린 뒤 다시 빌드하세요.</p>`;
+  return html`<ul class="insight-list">${items.map((d) => {
+    const sentence = `${d.title} (출처: ${d.source}, ${d.as_of} 기준)`;
+    const copy = html`<button type="button" class="copy-btn" aria-label="문장 복사">복사</button>`;
+    copy.onclick = async () => {
+      try { await navigator.clipboard.writeText(sentence); copy.textContent = "복사됨"; } catch { copy.textContent = "복사 실패"; }
+      setTimeout(() => (copy.textContent = "복사"), 1500);
+    };
+    return html`<li class=${`insight ${d.tone ?? ""}`}>
+      <div class="insight-body">
+        <span class="chip">${d.group}</span>
+        <p class="insight-title">${d.title}</p>
+        <p class="insight-meta">${d.sub ? `${d.sub} · ` : ""}${d.source} · ${d.as_of}</p>
+        ${d.detail ? html`<p class="insight-detail">${d.detail}</p>` : ""}
+      </div>${copy}
+    </li>`;
+  })}</ul>`;
+}

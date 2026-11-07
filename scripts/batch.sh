@@ -1,7 +1,7 @@
 #!/bin/sh
 # 주간 배치: 수집 → DB 백업(R2) → 빌드 → 배포. launchd(scripts/com.apt-insight.batch.plist)가 실행한다.
 # 수동 실행: scripts/batch.sh
-# 첫 수집은 API별 하루 9,000건씩 최신 달부터 과거로 채운다. 다 채울 때까지 하루 한 번씩 돌리면 된다.
+# 첫 수집(실거래 최근 10년 약 1시간, R-ONE 전체 약 30분)이 끝나면 이후 실행은 바뀐 부분만 받는다.
 set -eu
 cd "$(dirname "$0")/.."
 export PATH="$PWD/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
@@ -15,6 +15,8 @@ trap 'rmdir data/.batch.lock' EXIT
 echo "== $(date '+%F %T') 시작"
 python scripts/fetch_molit.py
 python scripts/fetch_kb.py
+python scripts/fetch_rone.py
+python scripts/fetch_news.py
 # ponytail: 월별 키로 덮어써서 1년에 12개가 쌓인다. wrangler 업로드는 파일당 약 300MB 까지라, DB 가 그보다 커지면 S3 API(rclone 등)로 바꾼다.
 npx wrangler r2 object put "apt-insight-backup/apt-$(date +%Y-%m).duckdb" --file data/apt.duckdb --remote
 npm run clean

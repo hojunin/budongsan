@@ -1,14 +1,23 @@
 // Observable Framework 설정 — https://observablehq.com/framework/config
 export default {
-  title: "첫 집 데이터",
+  title: "부동산 인사이트",
   root: "src",
   output: "dist",
   pages: [
-    {name: "시장 한눈에", path: "/"},
-    {name: "지역 비교", path: "/regions"},
-    {name: "타겟 단지", path: "/complexes"},
-    {name: "시장 온도 (KB)", path: "/market"},
-    {name: "예산 계산기", path: "/budget"},
+    {name: "오늘의 브리핑", path: "/"},
+    {name: "시장 분석", open: true, pages: [
+      {name: "실거래 분석", path: "/trades"},
+      {name: "지역 비교", path: "/regions"},
+      {name: "10년 추이", path: "/longterm"},
+      {name: "시장 지표 (부동산원·KB)", path: "/market"},
+      {name: "매수자 분석", path: "/buyers"}
+    ]},
+    {name: "뉴스·리포트", path: "/news"},
+    {name: "내 리포트", path: "/reports/"},
+    {name: "도구", open: false, pages: [
+      {name: "타겟 단지", path: "/complexes"},
+      {name: "예산 계산기", path: "/budget"}
+    ]},
     {name: "데이터 사전", path: "/about"}
   ],
   // 테마(air/near-midnight)와 토큰은 style.css 에서 불러온다. 라이트/다크 자동.
@@ -23,6 +32,6 @@ export default {
   toc: false,
   pager: false,
   search: false,
-  footer: "데이터: 국토교통부 실거래가 공개 API · KB부동산 데이터허브. 투자·법률 자문이 아닙니다.",
+  footer: "데이터: 국토교통부 실거래가 공개 API · 한국부동산원 R-ONE · KB부동산 · 언론사 RSS(제목·링크만). 투자·법률 자문이 아닙니다.",
   cleanUrls: true
 };

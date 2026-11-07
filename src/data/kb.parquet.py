@@ -7,8 +7,6 @@ import pandas as pd
 from _db import query
 
 VALUE_COL = {
-    "price_sale": "가격지수",
-    "price_jeonse": "가격지수",
     "jeonse_ratio": None,  # 마지막 숫자 컬럼 사용
     "buyer_index": "매수우위지수",
     "trade_activity": "매매거래지수",
@@ -46,8 +44,6 @@ else:
         walk = np.cumsum(rng.normal(0.2, 0.6, len(dates)))
         for i, d in enumerate(dates):
             rows += [
-                dict(metric="price_sale", region_code=code, region=name, date=d, value=95 + walk[i]),
-                dict(metric="price_jeonse", region_code=code, region=name, date=d, value=97 + walk[i] * .6),
                 dict(metric="jeonse_ratio", region_code=code, region=name, date=d, value=52 + rng.normal(0, 1.2)),
                 dict(metric="buyer_index", region_code=code, region=name, date=d, value=max(5, 70 + 30 * np.sin(i / 8) + rng.normal(0, 6))),
                 dict(metric="trade_activity", region_code=code, region=name, date=d, value=max(3, 30 + 20 * np.sin(i / 7) + rng.normal(0, 5))),
